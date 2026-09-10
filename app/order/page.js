@@ -5,7 +5,7 @@ import { MENU_DATA } from '@/data/menu';
 import Navbar from '@/components/Navbar';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Non Veg Curry', 'Alfam & Mandi', 'Starters', 'Chinese'];
+const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
 
 export default function OrderPage() {
   const [selectedTable, setSelectedTable] = useState('Table 1');
@@ -149,7 +149,11 @@ export default function OrderPage() {
               >
                 <div>
                   <p className="font-bold text-kerala-charcoal text-sm">{item.name}</p>
-                  <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
+                  {item.seasonal ? (
+                    <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
+                  ) : (
+                    <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
+                  )}
                 </div>
                 
                 {inCart ? (
@@ -158,6 +162,8 @@ export default function OrderPage() {
                     <span className="font-bold text-xs text-kerala-charcoal">{inCart.qty}</span>
                     <button onClick={() => updateQty(item.id, 1)} className="text-kerala-red font-bold px-1"><Plus size={14} /></button>
                   </div>
+                ) : item.seasonal ? (
+                  <span className="text-xs text-orange-400 font-semibold px-2 py-1">Ask price</span>
                 ) : (
                   <button
                     onClick={() => addToCart(item)}
