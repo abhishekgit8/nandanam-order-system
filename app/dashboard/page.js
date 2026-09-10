@@ -96,8 +96,8 @@ export default function DashboardPage() {
             .row { display: flex; justify-content: space-between; }
             .item-row { margin-bottom: 2px; }
             .item-top { display: flex; justify-content: space-between; }
-            .item-name { font-size: 9px; }
-            .item-vals { display: flex; justify-content: space-between; font-size: 9px; color: #333; }
+            .item-name { }
+            .item-vals { display: flex; justify-content: space-between; }
             .col-head { font-size: 8px; margin-bottom: 2px; }
             .footer { text-align: center; margin-top: 4px; font-size: 8px; }
           </style>
