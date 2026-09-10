@@ -77,9 +77,6 @@ export default function OrderPage() {
     setErrorMsg('');
 
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
-
       const { data, error } = await supabase
         .from('active_orders')
         .insert([
@@ -89,10 +86,9 @@ export default function OrderPage() {
             total_amount: totalAmount,
             status: 'PENDING',
           },
-        ])
-        .select();
+        ]);
 
-      clearTimeout(timeout);
+      console.log('Order submit result:', JSON.stringify({ data, error }));
 
       if (error) {
         console.error('Order submit error:', error);
@@ -105,7 +101,7 @@ export default function OrderPage() {
       }
     } catch (err) {
       console.error('Order submit exception:', err);
-      setErrorMsg(err.name === 'AbortError' ? 'Request timed out. Check your connection.' : err.message);
+      setErrorMsg(err.message);
       setTimeout(() => setErrorMsg(''), 5000);
     } finally {
       setLoading(false);

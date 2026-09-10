@@ -1,0 +1,182 @@
+id,name,category,price,seasonal,available,created_at
+1,Appam,Breakfast,18,false,true,2026-09-10 07:48:44.409141+00
+2,Idiappam,Breakfast,18,false,true,2026-09-10 07:48:44.409141+00
+3,Puttu,Breakfast,60,false,true,2026-09-10 07:48:44.409141+00
+4,Chappathi,Breakfast,18,false,true,2026-09-10 07:48:44.409141+00
+5,Porotta,Breakfast,20,false,true,2026-09-10 07:48:44.409141+00
+6,Wheat Porotta,Breakfast,25,false,true,2026-09-10 07:48:44.409141+00
+7,Nool Porotta,Breakfast,35,false,true,2026-09-10 07:48:44.409141+00
+8,Poori Baji,Breakfast,80,false,true,2026-09-10 07:48:44.409141+00
+9,Neer Dosa,Breakfast,18,false,true,2026-09-10 07:48:44.409141+00
+10,Set Dosa,Breakfast,70,false,true,2026-09-10 07:48:44.409141+00
+11,Plain Dosa,Breakfast,60,false,true,2026-09-10 07:48:44.409141+00
+12,Masala Dosa,Breakfast,80,false,true,2026-09-10 07:48:44.409141+00
+13,Ghee Roast,Breakfast,90,false,true,2026-09-10 07:48:44.409141+00
+14,Onion Dosa,Breakfast,90,false,true,2026-09-10 07:48:44.409141+00
+15,Egg Dosa,Breakfast,90,false,true,2026-09-10 07:48:44.409141+00
+16,Kadala Curry,Breakfast,70,false,true,2026-09-10 07:48:44.409141+00
+17,Greenpeas Curry,Breakfast,80,false,true,2026-09-10 07:48:44.409141+00
+18,Cherupayar Curry,Breakfast,70,false,true,2026-09-10 07:48:44.409141+00
+19,Egg Curry,Breakfast,70,false,true,2026-09-10 07:48:44.409141+00
+20,Egg Roast,Breakfast,90,false,true,2026-09-10 07:48:44.409141+00
+21,Aloobaji,Breakfast,70,false,true,2026-09-10 07:48:44.409141+00
+22,Veg Kuruma,Breakfast,90,false,true,2026-09-10 07:48:44.409141+00
+23,Kerala Meals,Rice & Biriyani,100,false,true,2026-09-10 07:48:44.409141+00
+24,Fish Curry Meals,Rice & Biriyani,180,false,true,2026-09-10 07:48:44.409141+00
+25,Chicken Curry Meals,Rice & Biriyani,170,false,true,2026-09-10 07:48:44.409141+00
+26,Pothichoru Veg,Rice & Biriyani,120,false,true,2026-09-10 07:48:44.409141+00
+27,Pothichoru Egg,Rice & Biriyani,150,false,true,2026-09-10 07:48:44.409141+00
+28,Pothichoru Fish,Rice & Biriyani,200,false,true,2026-09-10 07:48:44.409141+00
+29,Pothichoru Chicken,Rice & Biriyani,190,false,true,2026-09-10 07:48:44.409141+00
+30,Pothichoru Pothu,Rice & Biriyani,220,false,true,2026-09-10 07:48:44.409141+00
+31,Ghee Rice,Rice & Biriyani,110,false,true,2026-09-10 07:48:44.409141+00
+32,Biriyani Rice,Rice & Biriyani,120,false,true,2026-09-10 07:48:44.409141+00
+33,Egg Biriyani,Rice & Biriyani,160,false,true,2026-09-10 07:48:44.409141+00
+34,Veg Biriyani,Rice & Biriyani,150,false,true,2026-09-10 07:48:44.409141+00
+35,Paneer Biriyani,Rice & Biriyani,210,false,true,2026-09-10 07:48:44.409141+00
+36,Chicken Biriyani (Half),Rice & Biriyani,140,false,true,2026-09-10 07:48:44.409141+00
+37,Chicken Biriyani (Full),Rice & Biriyani,200,false,true,2026-09-10 07:48:44.409141+00
+38,Chicken Pothi Biriyani,Rice & Biriyani,220,false,true,2026-09-10 07:48:44.409141+00
+39,Pothu Biriyani (Half),Rice & Biriyani,150,false,true,2026-09-10 07:48:44.409141+00
+40,Pothu Biriyani (Full),Rice & Biriyani,230,false,true,2026-09-10 07:48:44.409141+00
+41,Pothu Pothi Biriyani,Rice & Biriyani,250,false,true,2026-09-10 07:48:44.409141+00
+42,Mutton Biriyani,Rice & Biriyani,380,false,true,2026-09-10 07:48:44.409141+00
+43,Kada Biriyani,Rice & Biriyani,260,false,true,2026-09-10 07:48:44.409141+00
+44,Kappa,Special,90,false,true,2026-09-10 07:48:44.409141+00
+45,Kappa Mix Veg,Special,160,false,true,2026-09-10 07:48:44.409141+00
+46,Kappa Mix Fish,Special,210,false,true,2026-09-10 07:48:44.409141+00
+47,Kappa Mix Chicken,Special,200,false,true,2026-09-10 07:48:44.409141+00
+48,Kappa Mix Pothu,Special,230,false,true,2026-09-10 07:48:44.409141+00
+49,Puttu Mix Egg,Special,160,false,true,2026-09-10 07:48:44.409141+00
+50,Puttu Mix Chicken,Special,210,false,true,2026-09-10 07:48:44.409141+00
+51,Puttu Mix Pothu,Special,240,false,true,2026-09-10 07:48:44.409141+00
+52,Kizhi Porotta Chicken,Special,210,false,true,2026-09-10 07:48:44.409141+00
+53,Kizhi Porotta Pothu,Special,240,false,true,2026-09-10 07:48:44.409141+00
+54,Pothi Porotta Chicken,Special,210,false,true,2026-09-10 07:48:44.409141+00
+55,Pothi Porotta Pothu,Special,240,false,true,2026-09-10 07:48:44.409141+00
+56,Kothu Porotta Veg,Special,160,false,true,2026-09-10 07:48:44.409141+00
+57,Kothu Porotta Egg,Special,160,false,true,2026-09-10 07:48:44.409141+00
+58,Kothu Porotta Chicken,Special,210,false,true,2026-09-10 07:48:44.409141+00
+59,Kothu Porotta Pothu,Special,240,false,true,2026-09-10 07:48:44.409141+00
+60,Pathal Mix Pothu,Special,240,false,true,2026-09-10 07:48:44.409141+00
+61,Ayala Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+62,Mathi Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+63,Squid Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+64,Choora Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+65,Avoli Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+66,Podimeen Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+67,Neimeen Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+68,Kilimeen Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+69,Prawns Fry,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+70,Prawns Roast,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+71,Squid Roast,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+72,Ayala Mulakittath,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+73,Mathi Mulakittath,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+74,Choora Mulakittath,Fish Fry & Curry,0,true,true,2026-09-10 07:48:44.409141+00
+75,Kanji,Homely Special,120,false,true,2026-09-10 07:48:44.409141+00
+76,Kanji & Fish Fry,Homely Special,0,true,true,2026-09-10 07:48:44.409141+00
+77,Kanji & Chicken Fry,Homely Special,200,false,true,2026-09-10 07:48:44.409141+00
+78,Chatti Choru,Homely Special,410,false,true,2026-09-10 07:48:44.409141+00
+79,Bellari Pothu Fry,Homely Special,270,false,true,2026-09-10 07:48:44.409141+00
+80,Kanthari Pothu Fry,Homely Special,270,false,true,2026-09-10 07:48:44.409141+00
+81,Chicken Varutharachath,Non Veg Curry,200,false,true,2026-09-10 07:48:44.409141+00
+82,Chicken Varattu,Non Veg Curry,240,false,true,2026-09-10 07:48:44.409141+00
+83,Chicken Kuruma,Non Veg Curry,220,false,true,2026-09-10 07:48:44.409141+00
+84,Chicken Roast,Non Veg Curry,240,false,true,2026-09-10 07:48:44.409141+00
+85,Chicken Chukka,Non Veg Curry,240,false,true,2026-09-10 07:48:44.409141+00
+86,Chicken Hyderabadi,Non Veg Curry,250,false,true,2026-09-10 07:48:44.409141+00
+87,Kada Roast,Non Veg Curry,200,false,true,2026-09-10 07:48:44.409141+00
+88,Kada Fry,Non Veg Curry,180,false,true,2026-09-10 07:48:44.409141+00
+89,BDF,Non Veg Curry,300,false,true,2026-09-10 07:48:44.409141+00
+90,Pothu Chilli,Non Veg Curry,340,false,true,2026-09-10 07:48:44.409141+00
+91,Chicken Masala,Non Veg Curry,270,false,true,2026-09-10 07:48:44.409141+00
+92,Thattukada Chicken Fry,Non Veg Curry,170,false,true,2026-09-10 07:48:44.409141+00
+93,Chicken Stew,Non Veg Curry,220,false,true,2026-09-10 07:48:44.409141+00
+94,Kadai Chicken,Non Veg Curry,250,false,true,2026-09-10 07:48:44.409141+00
+95,Pothu Roast (Half),Non Veg Curry,150,false,true,2026-09-10 07:48:44.409141+00
+96,Pothu Roast (Full),Non Veg Curry,240,false,true,2026-09-10 07:48:44.409141+00
+97,Pothu Fry (Half),Non Veg Curry,160,false,true,2026-09-10 07:48:44.409141+00
+98,Pothu Fry (Full),Non Veg Curry,250,false,true,2026-09-10 07:48:44.409141+00
+99,Mutton Roast,Non Veg Curry,330,false,true,2026-09-10 07:48:44.409141+00
+100,Egg Chilli,Egg Special,170,false,true,2026-09-10 07:48:44.409141+00
+101,Egg Manchurian,Egg Special,170,false,true,2026-09-10 07:48:44.409141+00
+102,Egg Masala Double,Egg Special,150,false,true,2026-09-10 07:48:44.409141+00
+103,Egg Burji,Egg Special,110,false,true,2026-09-10 07:48:44.409141+00
+104,Egg Omlet Single,Egg Special,30,false,true,2026-09-10 07:48:44.409141+00
+105,Bulls Eye Single,Egg Special,25,false,true,2026-09-10 07:48:44.409141+00
+106,Boiled Egg,Egg Special,15,false,true,2026-09-10 07:48:44.409141+00
+107,Gobi 65,Starters,150,false,true,2026-09-10 07:48:44.409141+00
+108,Gobi Manchurian,Starters,140,false,true,2026-09-10 07:48:44.409141+00
+109,Chilli Gobi,Starters,150,false,true,2026-09-10 07:48:44.409141+00
+110,Paneer 65,Starters,220,false,true,2026-09-10 07:48:44.409141+00
+111,Paneer Manchurian,Starters,190,false,true,2026-09-10 07:48:44.409141+00
+112,Paneer Chilli,Starters,190,false,true,2026-09-10 07:48:44.409141+00
+113,Paneer Pepper Dry,Starters,200,false,true,2026-09-10 07:48:44.409141+00
+114,Mushroom Chilli,Starters,170,false,true,2026-09-10 07:48:44.409141+00
+115,Mushroom Pepper Dry,Starters,190,false,true,2026-09-10 07:48:44.409141+00
+116,Mushroom Manchurian,Starters,170,false,true,2026-09-10 07:48:44.409141+00
+117,Chicken Kabab (Half),Starters,130,false,true,2026-09-10 07:48:44.409141+00
+118,Chicken Kabab (Full),Starters,250,false,true,2026-09-10 07:48:44.409141+00
+119,Chicken Manchurian,Starters,230,false,true,2026-09-10 07:48:44.409141+00
+120,Chicken 65,Starters,230,false,true,2026-09-10 07:48:44.409141+00
+121,Chilli Chicken,Starters,250,false,true,2026-09-10 07:48:44.409141+00
+122,Garlic Chicken,Starters,250,false,true,2026-09-10 07:48:44.409141+00
+123,Pepper Chicken,Starters,250,false,true,2026-09-10 07:48:44.409141+00
+124,Lemon Chicken,Starters,250,false,true,2026-09-10 07:48:44.409141+00
+125,Ginger Chicken,Starters,250,false,true,2026-09-10 07:48:44.409141+00
+126,Shawarma Roll,Shawarma,90,false,true,2026-09-10 07:48:44.409141+00
+127,Shawarma Plate,Shawarma,140,false,true,2026-09-10 07:48:44.409141+00
+128,Peri Peri Shawarma Roll,Shawarma,100,false,true,2026-09-10 07:48:44.409141+00
+129,Peri Peri Shawarma Plate,Shawarma,150,false,true,2026-09-10 07:48:44.409141+00
+130,Normal Alfam (Quarter),Alfam,160,false,true,2026-09-10 07:48:44.409141+00
+131,Normal Alfam (Half),Alfam,300,false,true,2026-09-10 07:48:44.409141+00
+132,Normal Alfam (Full),Alfam,570,false,true,2026-09-10 07:48:44.409141+00
+133,Peri Peri Alfam (Quarter),Alfam,200,false,true,2026-09-10 07:48:44.409141+00
+134,Peri Peri Alfam (Half),Alfam,350,false,true,2026-09-10 07:48:44.409141+00
+135,Peri Peri Alfam (Full),Alfam,650,false,true,2026-09-10 07:48:44.409141+00
+136,Honey Alfam (Quarter),Alfam,200,false,true,2026-09-10 07:48:44.409141+00
+137,Honey Alfam (Half),Alfam,350,false,true,2026-09-10 07:48:44.409141+00
+138,Honey Alfam (Full),Alfam,650,false,true,2026-09-10 07:48:44.409141+00
+139,Chicken Mandi (Quarter),Mandi,200,false,true,2026-09-10 07:48:44.409141+00
+140,Chicken Mandi (Half),Mandi,380,false,true,2026-09-10 07:48:44.409141+00
+141,Chicken Mandi (Full),Mandi,720,false,true,2026-09-10 07:48:44.409141+00
+142,Alfam Mandi (Quarter),Mandi,230,false,true,2026-09-10 07:48:44.409141+00
+143,Alfam Mandi (Half),Mandi,460,false,true,2026-09-10 07:48:44.409141+00
+144,Alfam Mandi (Full),Mandi,760,false,true,2026-09-10 07:48:44.409141+00
+145,Peri Peri Alfam Mandi (Quarter),Mandi,260,false,true,2026-09-10 07:48:44.409141+00
+146,Peri Peri Alfam Mandi (Half),Mandi,480,false,true,2026-09-10 07:48:44.409141+00
+147,Peri Peri Alfam Mandi (Full),Mandi,820,false,true,2026-09-10 07:48:44.409141+00
+148,Honey Alfam Mandi (Quarter),Mandi,260,false,true,2026-09-10 07:48:44.409141+00
+149,Honey Alfam Mandi (Half),Mandi,480,false,true,2026-09-10 07:48:44.409141+00
+150,Honey Alfam Mandi (Full),Mandi,820,false,true,2026-09-10 07:48:44.409141+00
+151,Veg Fried Rice,Fried Rice & Noodles,150,false,true,2026-09-10 07:48:44.409141+00
+152,Veg Noodles,Fried Rice & Noodles,160,false,true,2026-09-10 07:48:44.409141+00
+153,Mushroom Fried Rice,Fried Rice & Noodles,160,false,true,2026-09-10 07:48:44.409141+00
+154,Mushroom Noodles,Fried Rice & Noodles,170,false,true,2026-09-10 07:48:44.409141+00
+155,Paneer Fried Rice,Fried Rice & Noodles,180,false,true,2026-09-10 07:48:44.409141+00
+156,Paneer Noodles,Fried Rice & Noodles,210,false,true,2026-09-10 07:48:44.409141+00
+157,Egg Fried Rice,Fried Rice & Noodles,170,false,true,2026-09-10 07:48:44.409141+00
+158,Egg Noodles,Fried Rice & Noodles,180,false,true,2026-09-10 07:48:44.409141+00
+159,Chicken Fried Rice,Fried Rice & Noodles,180,false,true,2026-09-10 07:48:44.409141+00
+160,Chicken Noodles,Fried Rice & Noodles,190,false,true,2026-09-10 07:48:44.409141+00
+161,Veg Mix Fried Rice,Fried Rice & Noodles,190,false,true,2026-09-10 07:48:44.409141+00
+162,Veg Mix Noodles,Fried Rice & Noodles,200,false,true,2026-09-10 07:48:44.409141+00
+163,Non Veg Mix Fried Rice,Fried Rice & Noodles,280,false,true,2026-09-10 07:48:44.409141+00
+164,Non Veg Mix Noodles,Fried Rice & Noodles,290,false,true,2026-09-10 07:48:44.409141+00
+165,Tomato Fry,Chinese,120,false,true,2026-09-10 07:48:44.409141+00
+166,Mix Veg Curry,Chinese,140,false,true,2026-09-10 07:48:44.409141+00
+167,Paneer Butter Masala,Chinese,190,false,true,2026-09-10 07:48:44.409141+00
+168,Kadai Paneer,Chinese,210,false,true,2026-09-10 07:48:44.409141+00
+169,Mushroom Masala,Chinese,190,false,true,2026-09-10 07:48:44.409141+00
+170,Butter Chicken,Chinese,270,false,true,2026-09-10 07:48:44.409141+00
+171,Kadai Chicken,Chinese,280,false,true,2026-09-10 07:48:44.409141+00
+172,Pineapple Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+173,Watermelon Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+174,Muskmelon Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+175,Orange Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+176,Mosambi Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+177,Grape Pulpi,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+178,Lime Juice,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+179,Lime Soda,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+180,Chikku Shake,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
+181,Mango Shake,Juice & Shakes,0,true,true,2026-09-10 07:48:44.409141+00
