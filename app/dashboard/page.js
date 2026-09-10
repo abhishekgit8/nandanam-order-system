@@ -88,19 +88,19 @@ export default function DashboardPage() {
           <style>
             @page { size: 58mm auto; margin: 2mm; }
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Courier New', monospace; font-size: 11px; width: 54mm; padding: 0; }
+            body { font-family: 'Courier New', monospace; font-size: 10px; width: 54mm; padding: 0; }
             .center { text-align: center; }
             .bold { font-weight: bold; }
-            .line { border-top: 1px dashed #000; margin: 4px 0; }
-            .double-line { border-top: 3px double #000; margin: 4px 0; }
+            .line { border-top: 1px dashed #000; margin: 3px 0; }
+            .double-line { border-top: 3px double #000; margin: 3px 0; }
             .row { display: flex; justify-content: space-between; }
-            .item-row { display: flex; justify-content: space-between; margin-bottom: 1px; }
-            .item-name { flex: 1; }
-            .item-qty { width: 12mm; text-align: center; }
-            .item-rate { width: 14mm; text-align: right; }
-            .item-amt { width: 14mm; text-align: right; }
-            .col-head { font-size: 9px; margin-bottom: 2px; }
-            .footer { text-align: center; margin-top: 6px; font-size: 9px; }
+            .item-row { display: flex; align-items: baseline; margin-bottom: 1px; }
+            .item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .item-qty { width: 10mm; text-align: center; flex-shrink: 0; }
+            .item-rate { width: 12mm; text-align: right; flex-shrink: 0; }
+            .item-amt { width: 12mm; text-align: right; flex-shrink: 0; }
+            .col-head { font-size: 8px; margin-bottom: 2px; }
+            .footer { text-align: center; margin-top: 4px; font-size: 8px; }
           </style>
         </head>
         <body>
