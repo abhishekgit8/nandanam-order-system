@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { MENU_DATA } from '@/data/menu';
 import Navbar from '@/components/Navbar';
-import { Search, Plus, Minus, ShoppingBag, CheckCircle } from 'lucide-react';
+import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
 
@@ -15,6 +15,8 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [seasonalItem, setSeasonalItem] = useState(null);
+  const [seasonalPrice, setSeasonalPrice] = useState('');
 
   const filteredMenu = MENU_DATA.filter((item) => {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
@@ -30,6 +32,13 @@ export default function OrderPage() {
       }
       return [...prev, { ...item, qty: 1 }];
     });
+  };
+
+  const handleSeasonalAdd = () => {
+    if (!seasonalPrice || Number(seasonalPrice) <= 0) return;
+    addToCart({ ...seasonalItem, price: Number(seasonalPrice) });
+    setSeasonalItem(null);
+    setSeasonalPrice('');
   };
 
   const updateQty = (id, delta) => {
@@ -78,6 +87,40 @@ export default function OrderPage() {
   return (
     <div className="min-h-screen bg-kerala-cream pb-32">
       <Navbar />
+
+      {/* Seasonal Price Input Modal */}
+      {seasonalItem && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-kerala-charcoal text-lg">{seasonalItem.name}</h3>
+              <button onClick={() => { setSeasonalItem(null); setSeasonalPrice(''); }} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-3">Enter today&apos;s price for this item:</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg font-bold text-kerala-charcoal">₹</span>
+              <input
+                type="number"
+                autoFocus
+                value={seasonalPrice}
+                onChange={(e) => setSeasonalPrice(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSeasonalAdd()}
+                placeholder="0"
+                className="w-full text-2xl font-bold text-kerala-charcoal border-b-2 border-kerala-gold focus:border-kerala-red focus:outline-none py-2 bg-transparent"
+              />
+            </div>
+            <button
+              onClick={handleSeasonalAdd}
+              disabled={!seasonalPrice || Number(seasonalPrice) <= 0}
+              className="w-full bg-kerala-red text-white py-3 rounded-xl font-bold text-sm hover:bg-kerala-redHover disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Add to Cart — ₹{seasonalPrice || '0'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
         {/* Success Alert */}
@@ -163,7 +206,12 @@ export default function OrderPage() {
                     <button onClick={() => updateQty(item.id, 1)} className="text-kerala-red font-bold px-1"><Plus size={14} /></button>
                   </div>
                 ) : item.seasonal ? (
-                  <span className="text-xs text-orange-400 font-semibold px-2 py-1">Ask price</span>
+                  <button
+                    onClick={() => { setSeasonalItem(item); setSeasonalPrice(''); }}
+                    className="text-xs text-orange-500 font-semibold px-3 py-1.5 border border-orange-300 rounded-lg hover:bg-orange-50 transition"
+                  >
+                    Set Price
+                  </button>
                 ) : (
                   <button
                     onClick={() => addToCart(item)}
