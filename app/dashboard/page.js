@@ -1,0 +1,221 @@
+'use client';
+import { useEffect, useState, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
+import Navbar from '@/components/Navbar';
+import { Clock, Printer, XCircle, ChefHat } from 'lucide-react';
+
+function timeAgo(dateStr) {
+  const now = new Date();
+  const then = new Date(dateStr);
+  const diffMs = now - then;
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins === 1) return '1 min ago';
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  return `${hrs}h ${mins % 60}m ago`;
+}
+
+export default function DashboardPage() {
+  const [orders, setOrders] = useState([]);
+  const [fetchError, setFetchError] = useState('');
+  const [now, setNow] = useState(Date.now());
+
+  const fetchOrders = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('active_orders')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) {
+      console.error('Fetch orders error:', error);
+      setFetchError(error.message);
+    } else {
+      setOrders(data);
+      setFetchError('');
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+
+    let channel;
+    try {
+      channel = supabase
+        .channel('realtime_kitchen')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'active_orders' }, () => {
+          fetchOrders();
+        })
+        .subscribe((status) => {
+          if (status === 'CHANNEL_ERROR') {
+            console.error('Realtime subscription failed. Enable Realtime on active_orders table in Supabase.');
+          }
+        });
+    } catch (e) {
+      console.error('Realtime setup error:', e);
+    }
+
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+      clearInterval(timer);
+    };
+  }, [fetchOrders]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    if (newStatus === 'COMPLETED') {
+      await supabase.from('active_orders').delete().eq('id', orderId);
+    } else {
+      await supabase.from('active_orders').update({ status: newStatus }).eq('id', orderId);
+    }
+  };
+
+  const handleCancel = async (orderId) => {
+    await supabase.from('active_orders').delete().eq('id', orderId);
+  };
+
+  const handlePrint = (order) => {
+    const printWin = window.open('', '_blank', 'width=300,height=500');
+    printWin.document.write(`
+      <html>
+        <head>
+          <style>
+            body { font-family: monospace; width: 58mm; padding: 4px; font-size: 11px; }
+            .center { text-align: center; }
+            .line { border-bottom: 1px dashed #000; margin: 4px 0; }
+            .flex { display: flex; justify-content: space-between; }
+          </style>
+        </head>
+        <body>
+          <div class="center">
+            <h3>NANDANAM RESTAURANT</h3>
+            <p>Electronic City, Bengaluru</p>
+          </div>
+          <div class="line"></div>
+          <p><strong>Table:</strong> ${order.table_number}</p>
+          <div class="line"></div>
+          ${order.items.map(i => `<div class="flex"><span>${i.qty}x ${i.name}</span><span>₹${i.price * i.qty}</span></div>`).join('')}
+          <div class="line"></div>
+          <div class="flex" style="font-weight:bold;"><span>TOTAL:</span><span>₹${order.total_amount}</span></div>
+          <script>window.onload = function() { window.print(); window.close(); }</script>
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+  };
+
+  const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+
+  return (
+    <div className="min-h-screen bg-kerala-cream pb-12">
+      <Navbar pendingCount={pendingCount} />
+
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <h2 className="text-xl font-bold text-kerala-charcoal mb-4 flex items-center gap-2">
+          <Clock className="text-kerala-red" /> Live Kitchen Orders
+          {pendingCount > 0 && (
+            <span className="bg-kerala-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {pendingCount} pending
+            </span>
+          )}
+        </h2>
+
+        {fetchError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm font-semibold">
+            Error loading orders: {fetchError}
+          </div>
+        )}
+
+        {orders.length === 0 && !fetchError ? (
+          <div className="bg-white p-12 text-center rounded-2xl border border-gray-200">
+            <ChefHat className="mx-auto mb-4 text-gray-300" size={48} />
+            <p className="text-gray-400 font-semibold text-lg">No active orders</p>
+            <p className="text-gray-300 text-sm mt-1">Orders from the counter will appear here</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {orders.map((order) => {
+              const isPending = order.status === 'PENDING';
+              const elapsed = order.created_at ? timeAgo(order.created_at) : '';
+              const ageMin = order.created_at ? Math.floor((now - new Date(order.created_at)) / 60000) : 0;
+              const isStale = isPending && ageMin > 15;
+              return (
+                <div 
+                  key={order.id}
+                  className={`bg-white rounded-2xl border-2 p-4 shadow-md flex flex-col justify-between transition ${
+                    isStale ? 'border-orange-400 animate-pulse' : isPending ? 'border-kerala-red' : 'border-kerala-gold'
+                  }`}
+                >
+                  <div>
+                    <div className="flex justify-between items-center mb-3 border-b pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-extrabold text-lg text-kerala-charcoal">{order.table_number}</span>
+                        {elapsed && (
+                          <span className="text-[10px] text-gray-400 font-medium">{elapsed}</span>
+                        )}
+                      </div>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${
+                        isPending ? 'bg-red-100 text-kerala-red' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1.5 mb-4 text-sm text-gray-700">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between font-medium">
+                          <span>{item.qty}x {item.name}</span>
+                          <span>₹{item.price * item.qty}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-bold text-kerala-charcoal">Total:</span>
+                      <span className="font-extrabold text-base text-kerala-red">₹{order.total_amount}</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => handlePrint(order)}
+                        className="bg-gray-100 text-gray-700 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200 flex items-center justify-center gap-1"
+                      >
+                        <Printer size={14} /> Print
+                      </button>
+
+                      {isPending ? (
+                        <>
+                          <button
+                            onClick={() => handleStatusChange(order.id, 'SERVED')}
+                            className="bg-kerala-gold text-kerala-charcoal py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-400"
+                          >
+                            Served
+                          </button>
+                          <button
+                            onClick={() => handleCancel(order.id)}
+                            className="bg-red-100 text-red-600 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 flex items-center justify-center gap-1"
+                          >
+                            <XCircle size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleStatusChange(order.id, 'COMPLETED')}
+                          className="col-span-2 bg-kerala-red text-white py-1.5 rounded-lg text-xs font-bold hover:bg-kerala-redHover"
+                        >
+                          Clear Order
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kerala-red: #8B0000;
+  --color-kerala-red-hover: #6A0000;
+  --color-kerala-cream: #FDFBF7;
+  --color-kerala-cream-dark: #F5EFE6;
+  --color-kerala-gold: #D4AF37;
+  --color-kerala-charcoal: #2C221E;
+}
+
+body {
+  background-color: var(--color-kerala-cream);
+  color: var(--color-kerala-charcoal);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

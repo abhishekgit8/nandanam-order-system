@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </radialGradient>
+  </defs>
+  <!-- Outer flame glow -->
+  <ellipse cx="24" cy="14" rx="8" ry="10" fill="#FFD700" opacity="0.3"/>
+  <!-- Nilavilakku base -->
+  <rect x="20" y="38" width="8" height="4" rx="1" fill="#8B6914"/>
+  <rect x="18" y="42" width="12" height="3" rx="1.5" fill="#8B6914"/>
+  <!-- Lamp stem -->
+  <rect x="22" y="22" width="4" height="16" rx="1" fill="#D4AF37"/>
+  <!-- Lamp bowl -->
+  <path d="M17 24 Q17 20 24 18 Q31 20 31 24 Q31 28 24 28 Q17 28 17 24Z" fill="#D4AF37"/>
+  <!-- Flame -->
+  <path d="M24 8 Q28 14 26 17 Q24 20 22 17 Q20 14 24 8Z" fill="url(#glow)"/>
+  <path d="M24 10 Q26 14 25 16 Q24 18 23 16 Q22 14 24 10Z" fill="#FFF8DC"/>
+</svg>
