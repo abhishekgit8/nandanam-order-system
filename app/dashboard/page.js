@@ -94,11 +94,10 @@ export default function DashboardPage() {
             .line { border-top: 1px dashed #000; margin: 3px 0; }
             .double-line { border-top: 3px double #000; margin: 3px 0; }
             .row { display: flex; justify-content: space-between; }
-            .item-row { display: flex; align-items: baseline; margin-bottom: 1px; }
-            .item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .item-qty { width: 10mm; text-align: center; flex-shrink: 0; }
-            .item-rate { width: 12mm; text-align: right; flex-shrink: 0; }
-            .item-amt { width: 12mm; text-align: right; flex-shrink: 0; }
+            .item-row { margin-bottom: 2px; }
+            .item-top { display: flex; justify-content: space-between; }
+            .item-name { font-size: 9px; }
+            .item-vals { display: flex; justify-content: space-between; font-size: 9px; color: #333; }
             .col-head { font-size: 8px; margin-bottom: 2px; }
             .footer { text-align: center; margin-top: 4px; font-size: 8px; }
           </style>
@@ -117,19 +116,14 @@ export default function DashboardPage() {
             <span>${timeStr}</span>
           </div>
           <div class="line"></div>
-          <div class="row col-head bold">
-            <span style="flex:1;">Item</span>
-            <span style="width:12mm;text-align:center;">Qty</span>
-            <span style="width:14mm;text-align:right;">Rate</span>
-            <span style="width:14mm;text-align:right;">Amt</span>
-          </div>
-          <div class="line"></div>
           ${order.items.map(i => `
             <div class="item-row">
-              <span class="item-name">${i.name}</span>
-              <span class="item-qty">${i.qty}</span>
-              <span class="item-rate">₹${i.price}</span>
-              <span class="item-amt">₹${i.price * i.qty}</span>
+              <div class="item-top bold">${i.name}</div>
+              <div class="item-vals">
+                <span>Qty: ${i.qty}</span>
+                <span>Rate: ₹${i.price}</span>
+                <span>₹${i.price * i.qty}</span>
+              </div>
             </div>
           `).join('')}
           <div class="line"></div>
