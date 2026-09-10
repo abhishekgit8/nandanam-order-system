@@ -75,28 +75,65 @@ export default function DashboardPage() {
   };
 
   const handlePrint = (order) => {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-IN');
+    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    const orderNum = String(order.id).slice(-6);
+
     const receiptHtml = `
       <!DOCTYPE html>
       <html>
         <head>
+          <title>Nandanam Receipt</title>
           <style>
-            body { font-family: monospace; width: 58mm; padding: 4px; font-size: 11px; margin: 0; }
+            @page { size: 58mm auto; margin: 2mm; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Courier New', monospace; font-size: 11px; width: 54mm; padding: 0; }
             .center { text-align: center; }
-            .line { border-bottom: 1px dashed #000; margin: 4px 0; }
+            .bold { font-weight: bold; }
+            .line { border-top: 1px dashed #000; margin: 4px 0; }
             .row { display: flex; justify-content: space-between; }
+            .item-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+            .item-name { flex: 1; }
+            .item-qty { width: 18mm; text-align: center; }
+            .item-amt { width: 14mm; text-align: right; }
+            .header-line { letter-spacing: 1px; }
+            .footer { text-align: center; margin-top: 6px; font-size: 10px; }
           </style>
         </head>
         <body>
-          <div class="center">
-            <h3>NANDANAM RESTAURANT</h3>
-            <p>Electronic City, Bengaluru</p>
+          <div class="center bold header-line">NANDANAM</div>
+          <div class="center" style="font-size:9px;">Nostalgic Taste of Kerala</div>
+          <div class="center" style="font-size:9px;">Electronic City, Bengaluru</div>
+          <div class="line"></div>
+          <div class="row"><span class="bold">Order #${orderNum}</span><span>${dateStr}</span></div>
+          <div class="row"><span class="bold">Table:</span><span>${order.table_number}</span></div>
+          <div class="row"><span>Time:</span><span>${timeStr}</span></div>
+          <div class="line"></div>
+          <div style="margin: 4px 0;">
+            <div class="row bold" style="font-size:9px; margin-bottom:2px;">
+              <span style="flex:1;">Item</span>
+              <span style="width:18mm;text-align:center;">Qty</span>
+              <span style="width:14mm;text-align:right;">Amt</span>
+            </div>
+            ${order.items.map(i => `
+              <div class="item-row">
+                <span class="item-name">${i.name}</span>
+                <span class="item-qty">${i.qty}</span>
+                <span class="item-amt">₹${i.price * i.qty}</span>
+              </div>
+            `).join('')}
           </div>
           <div class="line"></div>
-          <p><strong>Table:</strong> ${order.table_number}</p>
+          <div class="row bold" style="font-size:12px;">
+            <span>TOTAL</span>
+            <span>₹${order.total_amount}</span>
+          </div>
           <div class="line"></div>
-          ${order.items.map(i => `<div class="row"><span>${i.qty}x ${i.name}</span><span>₹${i.price * i.qty}</span></div>`).join('')}
-          <div class="line"></div>
-          <div class="row" style="font-weight:bold;"><span>TOTAL:</span><span>₹${order.total_amount}</span></div>
+          <div class="footer">
+            <div>Thank you for dining with us!</div>
+            <div style="margin-top:2px;">Visit us again :)</div>
+          </div>
           <script>window.onload = function() { window.print(); }</script>
         </body>
       </html>
