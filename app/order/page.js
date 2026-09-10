@@ -76,25 +76,39 @@ export default function OrderPage() {
     setLoading(true);
     setErrorMsg('');
 
-    const { error } = await supabase.from('active_orders').insert([
-      {
-        table_number: selectedTable,
-        items: cart,
-        total_amount: totalAmount,
-        status: 'PENDING',
-      },
-    ]);
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
-    setLoading(false);
+      const { data, error } = await supabase
+        .from('active_orders')
+        .insert([
+          {
+            table_number: selectedTable,
+            items: cart,
+            total_amount: totalAmount,
+            status: 'PENDING',
+          },
+        ])
+        .select();
 
-    if (error) {
-      console.error('Order submit error:', error);
-      setErrorMsg(error.message || 'Failed to send order.');
+      clearTimeout(timeout);
+
+      if (error) {
+        console.error('Order submit error:', error);
+        setErrorMsg(error.message || 'Failed to send order.');
+        setTimeout(() => setErrorMsg(''), 5000);
+      } else {
+        setShowSuccess(true);
+        setCart([]);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
+    } catch (err) {
+      console.error('Order submit exception:', err);
+      setErrorMsg(err.name === 'AbortError' ? 'Request timed out. Check your connection.' : err.message);
       setTimeout(() => setErrorMsg(''), 5000);
-    } else {
-      setShowSuccess(true);
-      setCart([]);
-      setTimeout(() => setShowSuccess(false), 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
