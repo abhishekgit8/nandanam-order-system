@@ -75,15 +75,15 @@ export default function DashboardPage() {
   };
 
   const handlePrint = (order) => {
-    const printWin = window.open('', '_blank', 'width=300,height=500');
-    printWin.document.write(`
+    const receiptHtml = `
+      <!DOCTYPE html>
       <html>
         <head>
           <style>
-            body { font-family: monospace; width: 58mm; padding: 4px; font-size: 11px; }
+            body { font-family: monospace; width: 58mm; padding: 4px; font-size: 11px; margin: 0; }
             .center { text-align: center; }
             .line { border-bottom: 1px dashed #000; margin: 4px 0; }
-            .flex { display: flex; justify-content: space-between; }
+            .row { display: flex; justify-content: space-between; }
           </style>
         </head>
         <body>
@@ -94,14 +94,20 @@ export default function DashboardPage() {
           <div class="line"></div>
           <p><strong>Table:</strong> ${order.table_number}</p>
           <div class="line"></div>
-          ${order.items.map(i => `<div class="flex"><span>${i.qty}x ${i.name}</span><span>₹${i.price * i.qty}</span></div>`).join('')}
+          ${order.items.map(i => `<div class="row"><span>${i.qty}x ${i.name}</span><span>₹${i.price * i.qty}</span></div>`).join('')}
           <div class="line"></div>
-          <div class="flex" style="font-weight:bold;"><span>TOTAL:</span><span>₹${order.total_amount}</span></div>
-          <script>window.onload = function() { window.print(); window.close(); }</script>
+          <div class="row" style="font-weight:bold;"><span>TOTAL:</span><span>₹${order.total_amount}</span></div>
+          <script>window.onload = function() { window.print(); }</script>
         </body>
       </html>
-    `);
-    printWin.document.close();
+    `;
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.write(receiptHtml);
+      printWin.document.close();
+    } else {
+      alert('Popup blocked! Please allow popups for this site and try again.');
+    }
   };
 
   const pendingCount = orders.filter(o => o.status === 'PENDING').length;
