@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { getCachedMenu } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
