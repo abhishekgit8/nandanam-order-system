@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Utensils, LayoutDashboard } from 'lucide-react';
+import { Utensils, LayoutDashboard, DollarSign } from 'lucide-react';
 
 export default function Navbar({ pendingCount }) {
   return (
@@ -40,6 +40,12 @@ export default function Navbar({ pendingCount }) {
                 {pendingCount}
               </span>
             )}
+          </Link>
+          <Link 
+            href="/update-price" 
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-black/20 hover:bg-black/40 rounded-lg text-sm font-semibold border border-kerala-gold/30 transition"
+          >
+            <DollarSign size={16} /> Prices
           </Link>
         </nav>
       </div>

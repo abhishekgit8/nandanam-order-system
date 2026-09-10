@@ -1,13 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { MENU_DATA } from '@/data/menu';
 import Navbar from '@/components/Navbar';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
 
 export default function OrderPage() {
+  const [menuData, setMenuData] = useState([]);
+  const [menuLoading, setMenuLoading] = useState(true);
   const [selectedTable, setSelectedTable] = useState('Table 1');
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
@@ -18,7 +19,22 @@ export default function OrderPage() {
   const [seasonalItem, setSeasonalItem] = useState(null);
   const [seasonalPrice, setSeasonalPrice] = useState('');
 
-  const filteredMenu = MENU_DATA.filter((item) => {
+  useEffect(() => {
+    const fetchMenu = async () => {
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select('*')
+        .eq('available', true)
+        .order('category')
+        .order('name');
+      if (data) setMenuData(data);
+      if (error) console.error('Menu fetch error:', error);
+      setMenuLoading(false);
+    };
+    fetchMenu();
+  }, []);
+
+  const filteredMenu = menuData.filter((item) => {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
     return matchesCategory && matchesSearch;
@@ -62,20 +78,20 @@ export default function OrderPage() {
     setLoading(true);
     setErrorMsg('');
 
-    const { data, error } = await supabase.from('active_orders').insert([
+    const { error } = await supabase.from('active_orders').insert([
       {
         table_number: selectedTable,
         items: cart,
         total_amount: totalAmount,
         status: 'PENDING',
       },
-    ]).select();
+    ]);
 
     setLoading(false);
 
     if (error) {
       console.error('Order submit error:', error);
-      setErrorMsg(error.message || 'Failed to send order. Check Supabase table.');
+      setErrorMsg(error.message || 'Failed to send order.');
       setTimeout(() => setErrorMsg(''), 5000);
     } else {
       setShowSuccess(true);
@@ -83,6 +99,8 @@ export default function OrderPage() {
       setTimeout(() => setShowSuccess(false), 3000);
     }
   };
+
+  const needsPrice = (item) => item.seasonal && item.price === 0;
 
   return (
     <div className="min-h-screen bg-kerala-cream pb-32">
@@ -98,7 +116,7 @@ export default function OrderPage() {
                 <X size={20} />
               </button>
             </div>
-            <p className="text-sm text-gray-500 mb-3">Enter today&apos;s price for this item:</p>
+            <p className="text-sm text-gray-500 mb-3">Enter today&apos;s price:</p>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg font-bold text-kerala-charcoal">₹</span>
               <input
@@ -123,7 +141,6 @@ export default function OrderPage() {
       )}
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
-        {/* Success Alert */}
         {showSuccess && (
           <div className="bg-green-800 text-white p-3 rounded-xl shadow-lg flex items-center gap-2 animate-bounce">
             <CheckCircle size={20} />
@@ -131,14 +148,12 @@ export default function OrderPage() {
           </div>
         )}
 
-        {/* Error Alert */}
         {errorMsg && (
           <div className="bg-red-700 text-white p-3 rounded-xl shadow-lg flex items-center gap-2">
             <span className="font-bold text-sm">Error: {errorMsg}</span>
           </div>
         )}
 
-        {/* Table Selector */}
         <div className="bg-white p-3 rounded-xl shadow-sm border border-kerala-creamDark flex justify-between items-center">
           <label className="font-bold text-kerala-charcoal text-sm">Select Table:</label>
           <select 
@@ -152,19 +167,17 @@ export default function OrderPage() {
           </select>
         </div>
 
-        {/* Search Input */}
         <div className="relative">
           <Search className="absolute left-3 top-3 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search dish (e.g. Porotta, Biriyani)..."
+            placeholder="Search dish..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:border-kerala-red focus:outline-none shadow-sm"
           />
         </div>
 
-        {/* Category Pills */}
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {CATEGORIES.map((cat) => (
             <button
@@ -181,52 +194,59 @@ export default function OrderPage() {
           ))}
         </div>
 
-        {/* Menu Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {filteredMenu.map((item) => {
-            const inCart = cart.find((i) => i.id === item.id);
-            return (
-              <div 
-                key={item.id} 
-                className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center hover:border-kerala-gold transition"
-              >
-                <div>
-                  <p className="font-bold text-kerala-charcoal text-sm">{item.name}</p>
-                  {item.seasonal ? (
-                    <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
+        {menuLoading ? (
+          <div className="bg-white p-8 text-center rounded-2xl border border-gray-200">
+            <p className="text-gray-400 font-semibold">Loading menu...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredMenu.map((item) => {
+              const inCart = cart.find((i) => i.id === item.id);
+              const needsPriceItem = needsPrice(item);
+              return (
+                <div 
+                  key={item.id} 
+                  className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center hover:border-kerala-gold transition"
+                >
+                  <div>
+                    <p className="font-bold text-kerala-charcoal text-sm">{item.name}</p>
+                    {item.seasonal && item.price === 0 ? (
+                      <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
+                    ) : item.seasonal ? (
+                      <p className="text-xs text-orange-500 font-semibold">₹{item.price}</p>
+                    ) : (
+                      <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
+                    )}
+                  </div>
+                  
+                  {inCart ? (
+                    <div className="flex items-center gap-2 bg-kerala-cream px-2 py-1 rounded-lg border border-kerala-gold">
+                      <button onClick={() => updateQty(item.id, -1)} className="text-kerala-red font-bold px-1"><Minus size={14} /></button>
+                      <span className="font-bold text-xs text-kerala-charcoal">{inCart.qty}</span>
+                      <button onClick={() => updateQty(item.id, 1)} className="text-kerala-red font-bold px-1"><Plus size={14} /></button>
+                    </div>
+                  ) : needsPriceItem ? (
+                    <button
+                      onClick={() => { setSeasonalItem(item); setSeasonalPrice(''); }}
+                      className="text-xs text-orange-500 font-semibold px-3 py-1.5 border border-orange-300 rounded-lg hover:bg-orange-50 transition"
+                    >
+                      Set Price
+                    </button>
                   ) : (
-                    <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
+                    <button
+                      onClick={() => addToCart(item)}
+                      className="bg-kerala-red text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-kerala-redHover flex items-center gap-1 shadow-sm"
+                    >
+                      <Plus size={14} /> Add
+                    </button>
                   )}
                 </div>
-                
-                {inCart ? (
-                  <div className="flex items-center gap-2 bg-kerala-cream px-2 py-1 rounded-lg border border-kerala-gold">
-                    <button onClick={() => updateQty(item.id, -1)} className="text-kerala-red font-bold px-1"><Minus size={14} /></button>
-                    <span className="font-bold text-xs text-kerala-charcoal">{inCart.qty}</span>
-                    <button onClick={() => updateQty(item.id, 1)} className="text-kerala-red font-bold px-1"><Plus size={14} /></button>
-                  </div>
-                ) : item.seasonal ? (
-                  <button
-                    onClick={() => { setSeasonalItem(item); setSeasonalPrice(''); }}
-                    className="text-xs text-orange-500 font-semibold px-3 py-1.5 border border-orange-300 rounded-lg hover:bg-orange-50 transition"
-                  >
-                    Set Price
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => addToCart(item)}
-                    className="bg-kerala-red text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-kerala-redHover flex items-center gap-1 shadow-sm"
-                  >
-                    <Plus size={14} /> Add
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
 
-      {/* Floating Bottom Cart Bar */}
       {cart.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-kerala-gold p-4 shadow-2xl z-40">
           <div className="max-w-3xl mx-auto flex justify-between items-center">
