@@ -78,7 +78,7 @@ export default function DashboardPage() {
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-IN');
     const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-    const orderNum = String(order.id).slice(-6);
+    const kotNum = order.kot_number || String(order.id).slice(-6);
 
     const receiptHtml = `
       <!DOCTYPE html>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
           <div class="center" style="font-size:9px;">Bengaluru</div>
           <div class="double-line"></div>
           <div class="row bold" style="font-size:10px;">
-            <span>KOT #${orderNum}</span>
+            <span>KOT #${kotNum}</span>
             <span>${dateStr}</span>
           </div>
           <div class="row">
