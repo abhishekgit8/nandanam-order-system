@@ -42,8 +42,14 @@ export default function DashboardPage() {
     try {
       channel = supabase
         .channel('realtime_kitchen')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'active_orders' }, () => {
-          fetchOrders();
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'active_orders' }, (payload) => {
+          setOrders((prev) => [...prev, payload.new]);
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'active_orders' }, (payload) => {
+          setOrders((prev) => prev.map((o) => o.id === payload.new.id ? payload.new : o));
+        })
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'active_orders' }, (payload) => {
+          setOrders((prev) => prev.filter((o) => o.id !== payload.old.id));
         })
         .subscribe((status) => {
           if (status === 'CHANNEL_ERROR') {
@@ -64,14 +70,20 @@ export default function DashboardPage() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     if (newStatus === 'COMPLETED') {
-      await supabase.from('active_orders').delete().eq('id', orderId);
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      const { error } = await supabase.from('active_orders').delete().eq('id', orderId);
+      if (error) fetchOrders();
     } else {
-      await supabase.from('active_orders').update({ status: newStatus }).eq('id', orderId);
+      setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
+      const { error } = await supabase.from('active_orders').update({ status: newStatus }).eq('id', orderId);
+      if (error) fetchOrders();
     }
   };
 
   const handleCancel = async (orderId) => {
-    await supabase.from('active_orders').delete().eq('id', orderId);
+    setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    const { error } = await supabase.from('active_orders').delete().eq('id', orderId);
+    if (error) fetchOrders();
   };
 
   const handlePrint = (order) => {

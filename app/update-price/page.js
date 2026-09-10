@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import { Save, Check, Search, ToggleLeft, ToggleRight } from 'lucide-react';
 
@@ -20,13 +21,12 @@ export default function UpdatePricePage() {
   }, []);
 
   const fetchMenu = async () => {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .order('category')
-      .order('name');
-    if (data) setMenuItems(data);
-    if (error) console.error('Menu fetch error:', error);
+    try {
+      const data = await getAllMenuItems();
+      setMenuItems(data);
+    } catch (error) {
+      console.error('Menu fetch error:', error);
+    }
     setLoading(false);
   };
 
@@ -69,10 +69,25 @@ export default function UpdatePricePage() {
     });
 
     await Promise.all(updates);
+    
+    // Update local state from edits instead of refetching
+    setMenuItems((prev) =>
+      prev.map((item) => {
+        const changes = edits[item.id];
+        if (!changes) return item;
+        return {
+          ...item,
+          ...(changes.price !== undefined && { price: Number(changes.price) }),
+          ...(changes.seasonal !== undefined && { seasonal: changes.seasonal }),
+          ...(changes.available !== undefined && { available: changes.available }),
+        };
+      })
+    );
+    
+    invalidateMenuCache();
     setEdits({});
     setSaving(false);
     setSaved(true);
-    fetchMenu();
     setTimeout(() => setSaved(false), 2000);
   };
 

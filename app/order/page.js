@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { getCachedMenu } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
@@ -21,14 +21,12 @@ export default function OrderPage() {
 
   useEffect(() => {
     const fetchMenu = async () => {
-      const { data, error } = await supabase
-        .from('menu_items')
-        .select('*')
-        .eq('available', true)
-        .order('category')
-        .order('name');
-      if (data) setMenuData(data);
-      if (error) console.error('Menu fetch error:', error);
+      try {
+        const data = await getCachedMenu();
+        setMenuData(data);
+      } catch (error) {
+        console.error('Menu fetch error:', error);
+      }
       setMenuLoading(false);
     };
     fetchMenu();
