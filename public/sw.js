@@ -1,12 +1,9 @@
 const CACHE_NAME = 'nandanam-v1';
 const STATIC_ASSETS = [
-  '/',
-  '/order',
-  '/dashboard',
-  '/update-price',
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.json',
+  '/logo.svg',
 ];
 
 self.addEventListener('install', (event) => {
@@ -30,10 +27,15 @@ self.addEventListener('fetch', (event) => {
 
   if (request.url.includes('supabase')) return;
 
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).catch(() => caches.match('/')));
+    return;
+  }
+
   event.respondWith(
     caches.match(request).then((cached) => {
       const fetched = fetch(request).then((response) => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
