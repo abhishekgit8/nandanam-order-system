@@ -84,7 +84,7 @@ export default function DashboardPage() {
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Nandanam Receipt</title>
+          <title>Nandanam Restaurant</title>
           <style>
             @page { size: 58mm auto; margin: 2mm; }
             * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -92,47 +92,55 @@ export default function DashboardPage() {
             .center { text-align: center; }
             .bold { font-weight: bold; }
             .line { border-top: 1px dashed #000; margin: 4px 0; }
+            .double-line { border-top: 3px double #000; margin: 4px 0; }
             .row { display: flex; justify-content: space-between; }
-            .item-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+            .item-row { display: flex; justify-content: space-between; margin-bottom: 1px; }
             .item-name { flex: 1; }
-            .item-qty { width: 18mm; text-align: center; }
+            .item-qty { width: 12mm; text-align: center; }
+            .item-rate { width: 14mm; text-align: right; }
             .item-amt { width: 14mm; text-align: right; }
-            .header-line { letter-spacing: 1px; }
-            .footer { text-align: center; margin-top: 6px; font-size: 10px; }
+            .col-head { font-size: 9px; margin-bottom: 2px; }
+            .footer { text-align: center; margin-top: 6px; font-size: 9px; }
           </style>
         </head>
         <body>
-          <div class="center bold header-line">NANDANAM</div>
-          <div class="center" style="font-size:9px;">Nostalgic Taste of Kerala</div>
-          <div class="center" style="font-size:9px;">Electronic City, Bengaluru</div>
-          <div class="line"></div>
-          <div class="row"><span class="bold">Order #${orderNum}</span><span>${dateStr}</span></div>
-          <div class="row"><span class="bold">Table:</span><span>${order.table_number}</span></div>
-          <div class="row"><span>Time:</span><span>${timeStr}</span></div>
-          <div class="line"></div>
-          <div style="margin: 4px 0;">
-            <div class="row bold" style="font-size:9px; margin-bottom:2px;">
-              <span style="flex:1;">Item</span>
-              <span style="width:18mm;text-align:center;">Qty</span>
-              <span style="width:14mm;text-align:right;">Amt</span>
-            </div>
-            ${order.items.map(i => `
-              <div class="item-row">
-                <span class="item-name">${i.name}</span>
-                <span class="item-qty">${i.qty}</span>
-                <span class="item-amt">₹${i.price * i.qty}</span>
-              </div>
-            `).join('')}
+          <div class="center bold" style="font-size:14px; letter-spacing:1px;">NANDANAM RESTAURANT</div>
+          <div class="center" style="font-size:9px;">Ananda Nagar, Electronic City</div>
+          <div class="center" style="font-size:9px;">Bengaluru</div>
+          <div class="double-line"></div>
+          <div class="row bold" style="font-size:10px;">
+            <span>KOT #${orderNum}</span>
+            <span>${dateStr}</span>
           </div>
+          <div class="row">
+            <span class="bold">Table: ${order.table_number}</span>
+            <span>${timeStr}</span>
+          </div>
+          <div class="line"></div>
+          <div class="row col-head bold">
+            <span style="flex:1;">Item</span>
+            <span style="width:12mm;text-align:center;">Qty</span>
+            <span style="width:14mm;text-align:right;">Rate</span>
+            <span style="width:14mm;text-align:right;">Amt</span>
+          </div>
+          <div class="line"></div>
+          ${order.items.map(i => `
+            <div class="item-row">
+              <span class="item-name">${i.name}</span>
+              <span class="item-qty">${i.qty}</span>
+              <span class="item-rate">₹${i.price}</span>
+              <span class="item-amt">₹${i.price * i.qty}</span>
+            </div>
+          `).join('')}
           <div class="line"></div>
           <div class="row bold" style="font-size:12px;">
             <span>TOTAL</span>
             <span>₹${order.total_amount}</span>
           </div>
-          <div class="line"></div>
+          <div class="double-line"></div>
           <div class="footer">
-            <div>Thank you for dining with us!</div>
-            <div style="margin-top:2px;">Visit us again :)</div>
+            <div class="bold">Thank You!</div>
+            <div>Please visit us again.</div>
           </div>
           <script>window.onload = function() { window.print(); }</script>
         </body>
