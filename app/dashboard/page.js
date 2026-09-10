@@ -195,16 +195,23 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {orders.map((order) => {
+            {[...orders].sort((a, b) => {
+              if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
+              if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
+              return new Date(a.created_at) - new Date(b.created_at);
+            }).map((order) => {
               const isPending = order.status === 'PENDING';
+              const isServed = order.status === 'SERVED';
               const elapsed = order.created_at ? timeAgo(order.created_at) : '';
               const ageMin = order.created_at ? Math.floor((now - new Date(order.created_at)) / 60000) : 0;
               const isStale = isPending && ageMin > 15;
               return (
                 <div 
                   key={order.id}
-                  className={`bg-white rounded-2xl border-2 p-4 shadow-md flex flex-col justify-between transition ${
-                    isStale ? 'border-orange-400 animate-pulse' : isPending ? 'border-kerala-red' : 'border-kerala-gold'
+                  className={`rounded-2xl border-2 p-4 shadow-md flex flex-col justify-between transition ${
+                    isStale ? 'bg-white border-orange-400 animate-pulse' 
+                    : isPending ? 'bg-white border-kerala-red' 
+                    : 'bg-gray-50 border-gray-300 opacity-75'
                   }`}
                 >
                   <div>
@@ -216,9 +223,9 @@ export default function DashboardPage() {
                         )}
                       </div>
                       <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${
-                        isPending ? 'bg-red-100 text-kerala-red' : 'bg-yellow-100 text-yellow-800'
+                        isPending ? 'bg-red-100 text-kerala-red' : 'bg-green-100 text-green-700'
                       }`}>
-                        {order.status}
+                        {isPending ? 'PENDING' : 'SERVED'}
                       </span>
                     </div>
 
