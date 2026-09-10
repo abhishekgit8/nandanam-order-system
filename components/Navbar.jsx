@@ -1,7 +1,20 @@
+'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Utensils, LayoutDashboard, DollarSign } from 'lucide-react';
 
 export default function Navbar({ pendingCount }) {
+  const pathname = usePathname();
+
+  const isActive = (path) => pathname === path;
+
+  const linkClass = (path) =>
+    `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+      isActive(path)
+        ? 'bg-kerala-gold text-kerala-charcoal border-kerala-gold shadow'
+        : 'bg-black/20 text-white border-kerala-gold/30 hover:bg-black/40'
+    }`;
+
   return (
     <header className="bg-kerala-red text-kerala-cream shadow-md sticky top-0 z-50 border-b-2 border-kerala-gold">
       <div className="max-w-7xl mx-auto px-3 py-2 flex justify-between items-center">
@@ -21,28 +34,19 @@ export default function Navbar({ pendingCount }) {
         </Link>
 
         <nav className="flex gap-1.5">
-          <Link 
-            href="/order" 
-            className="flex items-center gap-1 px-2 py-1.5 bg-black/20 hover:bg-black/40 rounded-lg text-xs font-semibold border border-kerala-gold/30 transition"
-          >
-            <Utensils size={14} /> <span className="hidden sm:inline">Take Order</span>
+          <Link href="/order" className={linkClass('/order')}>
+            <Utensils size={14} /> Take Order
           </Link>
-          <Link 
-            href="/dashboard" 
-            className="relative flex items-center gap-1 px-2 py-1.5 bg-kerala-gold text-kerala-charcoal rounded-lg text-xs font-bold shadow hover:bg-yellow-400 transition"
-          >
-            <LayoutDashboard size={14} /> <span className="hidden sm:inline">Dashboard</span>
+          <Link href="/dashboard" className={`relative ${linkClass('/dashboard')}`}>
+            <LayoutDashboard size={14} /> Dashboard
             {pendingCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
                 {pendingCount}
               </span>
             )}
           </Link>
-          <Link 
-            href="/update-price" 
-            className="flex items-center gap-1 px-2 py-1.5 bg-black/20 hover:bg-black/40 rounded-lg text-xs font-semibold border border-kerala-gold/30 transition"
-          >
-            <DollarSign size={14} /> <span className="hidden sm:inline">Prices</span>
+          <Link href="/update-price" className={linkClass('/update-price')}>
+            <DollarSign size={14} /> Prices
           </Link>
         </nav>
       </div>
