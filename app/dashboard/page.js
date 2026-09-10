@@ -99,6 +99,10 @@ export default function DashboardPage() {
           <title>Nandanam Restaurant</title>
           <style>
             @page { size: 58mm auto; margin: 2mm; }
+            @media print {
+              html, body { width: 58mm; height: auto; margin: 0; padding: 0; overflow: hidden; }
+              @page { size: 58mm auto; margin: 2mm; }
+            }
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { font-family: 'Courier New', monospace; font-size: 10px; width: 54mm; padding: 0; }
             .center { text-align: center; }
