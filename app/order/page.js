@@ -149,20 +149,20 @@ export default function OrderPage() {
         </div>
       )}
 
+      {showSuccess && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-green-800 text-white p-3 rounded-xl shadow-lg flex items-center gap-2 animate-bounce max-w-sm w-full mx-4">
+          <CheckCircle size={20} />
+          <span className="font-bold text-sm">Order sent to kitchen for {selectedTable}!</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-red-700 text-white p-3 rounded-xl shadow-lg flex items-center gap-2 max-w-sm w-full mx-4">
+          <span className="font-bold text-sm">Error: {errorMsg}</span>
+        </div>
+      )}
+
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
-        {showSuccess && (
-          <div className="bg-green-800 text-white p-3 rounded-xl shadow-lg flex items-center gap-2 animate-bounce">
-            <CheckCircle size={20} />
-            <span className="font-bold text-sm">Order sent to kitchen for {selectedTable}!</span>
-          </div>
-        )}
-
-        {errorMsg && (
-          <div className="bg-red-700 text-white p-3 rounded-xl shadow-lg flex items-center gap-2">
-            <span className="font-bold text-sm">Error: {errorMsg}</span>
-          </div>
-        )}
-
         <div className="bg-white p-3 rounded-xl shadow-sm border border-kerala-creamDark flex justify-between items-center">
           <label className="font-bold text-kerala-charcoal text-sm">Select Table:</label>
           <select 
