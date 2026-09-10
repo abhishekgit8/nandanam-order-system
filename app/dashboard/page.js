@@ -109,7 +109,7 @@ export default function DashboardPage() {
             .item-row { margin-bottom: 2px; }
             .item-top { display: flex; justify-content: space-between; }
             .item-name { }
-            .item-vals { display: flex; justify-content: space-between; }
+            .item-vals { display: flex; justify-content: space-between; font-size: 11px; }
             .col-head { font-size: 8px; margin-bottom: 2px; }
             .footer { text-align: center; margin-top: 4px; font-size: 8px; }
           </style>
