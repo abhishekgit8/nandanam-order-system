@@ -184,7 +184,7 @@ export default function DashboardPage() {
   }, [orders]);
 
   return (
-    <div className="min-h-screen bg-kerala-cream pb-20 sm:pb-12">
+    <div className="min-h-screen bg-kerala-cream pb-20 sm:pb-12 sm:ml-56">
       <Navbar pendingCount={pendingCount} />
 
       <main className="max-w-7xl mx-auto px-4 py-6">

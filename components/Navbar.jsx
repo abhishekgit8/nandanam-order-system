@@ -1,14 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Utensils, LayoutDashboard, DollarSign, ChefHat } from 'lucide-react';
+import { Utensils, LayoutDashboard, DollarSign, ChefHat, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
 
 const NAV_ITEMS = [
   { href: '/order', label: 'Orders', icon: Utensils },
   { href: '/dashboard', label: 'Kitchen', icon: ChefHat },
   { href: '/update-price', label: 'Menu', icon: DollarSign },
-  { href: '/reports', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/reports', label: 'Dashboard', icon: BarChart3 },
 ];
 
 export default function Navbar({ pendingCount }) {
@@ -17,38 +17,43 @@ export default function Navbar({ pendingCount }) {
 
   return (
     <>
-      {/* Top navbar — desktop only */}
-      <header className="bg-kerala-red text-kerala-cream shadow-md sticky top-0 z-50 border-b-2 border-kerala-gold hidden sm:block">
-        <div className="max-w-7xl mx-auto px-3 py-2 flex justify-between items-center">
-          <Link href="/order" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full overflow-hidden shadow-md group-hover:scale-105 transition bg-white">
-              <Image src="/logo.png" alt="Nandanam" width={40} height={40} className="object-contain" />
-            </div>
-            <h1 className="font-extrabold text-lg tracking-wide text-white">NANDANAM</h1>
-          </Link>
-
-          <nav className="flex gap-1.5">
-            {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
-                  isActive(href)
-                    ? 'bg-kerala-gold text-kerala-charcoal border-kerala-gold shadow'
-                    : 'bg-black/20 text-white border-kerala-gold/30 hover:bg-black/40'
-                }`}
-              >
-                <Icon size={14} /> {label}
-              </Link>
-            ))}
-          </nav>
+      {/* Desktop sidebar */}
+      <aside className="hidden sm:flex fixed left-0 top-0 bottom-0 w-56 bg-gradient-to-b from-[#7E060C] to-[#5E0409] text-white flex-col z-50">
+        <div className="px-4 pt-5 pb-4 text-center border-b border-white/10">
+          <div className="w-16 h-16 mx-auto rounded-2xl overflow-hidden bg-white p-1 shadow-lg">
+            <Image src="/logo.png" alt="Nandanam" width={64} height={64} className="object-contain" />
+          </div>
+          <h1 className="font-['Playfair_Display'] text-xl font-bold mt-2">Nandanam</h1>
+          <small className="text-[11px] opacity-70">Restaurant</small>
         </div>
-      </header>
 
-      {/* Mobile top bar — logo only */}
+        <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13.5px] transition ${
+                isActive(href)
+                  ? 'bg-white text-[#B00911] font-semibold'
+                  : 'text-white/85 hover:bg-white/10'
+              }`}
+            >
+              <Icon size={18} />
+              <span className="flex-1">{label}</span>
+              {href === '/dashboard' && pendingCount > 0 && (
+                <span className="bg-[#BE5911] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {pendingCount}
+                </span>
+              )}
+            </Link>
+          ))}
+        </nav>
+      </aside>
+
+      {/* Mobile top bar */}
       <header className="bg-kerala-red sm:hidden sticky top-0 z-50 border-b-2 border-kerala-gold">
         <div className="px-3 py-2 flex items-center">
-          <Link href="/order" className="flex items-center gap-2 group">
+          <Link href="/order" className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full overflow-hidden shadow-md bg-white">
               <Image src="/logo.png" alt="Nandanam" width={36} height={36} className="object-contain" />
             </div>
@@ -64,9 +69,7 @@ export default function Navbar({ pendingCount }) {
             key={href}
             href={href}
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition ${
-              isActive(href)
-                ? 'text-kerala-red font-bold'
-                : 'text-gray-400'
+              isActive(href) ? 'text-kerala-red font-bold' : 'text-gray-400'
             }`}
           >
             <div className="relative">
