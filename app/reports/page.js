@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import { Calendar, TrendingUp, ShoppingBag, DollarSign, Download, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
+import { Calendar, TrendingUp, ShoppingBag, IndianRupee, Download, ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
 import { generateReportPDF } from '@/lib/pdfExport';
 
 function getDaysInMonth(year, month) {
@@ -149,7 +149,7 @@ export default function ReportsPage() {
                 <p className="text-xs text-gray-500">Total Orders</p>
               </div>
               <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 text-center">
-                <DollarSign className="mx-auto mb-2 text-kerala-red" size={24} />
+                <IndianRupee className="mx-auto mb-2 text-kerala-red" size={24} />
                 <p className="text-2xl font-extrabold text-kerala-red">₹{dailySummary.totalRevenue}</p>
                 <p className="text-xs text-gray-500">Total Revenue</p>
               </div>
