@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Utensils, LayoutDashboard, DollarSign } from 'lucide-react';
+import { Utensils, LayoutDashboard, DollarSign, BarChart3 } from 'lucide-react';
 
 export default function Navbar({ pendingCount }) {
   const pathname = usePathname();
@@ -47,6 +47,9 @@ export default function Navbar({ pendingCount }) {
           </Link>
           <Link href="/update-price" className={linkClass('/update-price')}>
             <DollarSign size={14} /> Prices
+          </Link>
+          <Link href="/reports" className={linkClass('/reports')}>
+            <BarChart3 size={14} /> Reports
           </Link>
         </nav>
       </div>
