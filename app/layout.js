@@ -1,5 +1,6 @@
 import './globals.css'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import Toast from '@/components/Toast'
 
 export const metadata = {
   title: 'Nandanam Restaurant - Order System',
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <ErrorBoundary>
+          <Toast />
           {children}
         </ErrorBoundary>
         <script dangerouslySetInnerHTML={{ __html: `
