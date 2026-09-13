@@ -2,14 +2,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { getAllMenuItems, getCachedCategories, invalidateMenuCache } from '@/lib/menuCache';
+import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import { Save, Check, Search, ToggleLeft, ToggleRight, Plus, Trash2, X } from 'lucide-react';
 
 export default function UpdatePricePage() {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -32,12 +31,8 @@ export default function UpdatePricePage() {
 
   const fetchData = async () => {
     try {
-      const [menuData, catData] = await Promise.all([
-        getAllMenuItems(),
-        getCachedCategories(),
-      ]);
+      const menuData = await getAllMenuItems();
       setMenuItems(menuData);
-      if (catData) setCategories(catData);
     } catch (error) {
       console.error('Fetch error:', error);
     }
@@ -45,8 +40,9 @@ export default function UpdatePricePage() {
   };
 
   const categoryNames = useMemo(() => {
-    return ['All', ...categories.map((c) => c.name)];
-  }, [categories]);
+    const cats = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
+    return ['All', ...cats.sort()];
+  }, [menuItems]);
 
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
@@ -144,13 +140,11 @@ export default function UpdatePricePage() {
     if (!newCategoryName.trim()) return;
     const { error } = await supabase
       .from('categories')
-      .insert([{ name: newCategoryName.trim(), sort_order: categories.length }]);
+      .insert([{ name: newCategoryName.trim(), sort_order: 0 }]);
     if (!error) {
-      setCategories((prev) => [...prev, { name: newCategoryName.trim() }]);
       setNewItem((prev) => ({ ...prev, category: newCategoryName.trim() }));
       setNewCategoryName('');
       setShowNewCategory(false);
-      invalidateMenuCache();
     }
   };
 
@@ -220,8 +214,8 @@ export default function UpdatePricePage() {
                   className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none w-full"
                 >
                   <option value="">Select category</option>
-                  {categories.map((c) => (
-                    <option key={c.id || c.name} value={c.name}>{c.name}</option>
+                  {categoryNames.filter((c) => c !== 'All').map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
                   ))}
                   <option value="__new__">+ New Category</option>
                 </select>

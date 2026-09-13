@@ -6,8 +6,6 @@ import Navbar from '@/components/Navbar';
 import TableSelector from '@/components/TableSelector';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
-
 export default function OrderPage() {
   const [menuData, setMenuData] = useState([]);
   const [menuLoading, setMenuLoading] = useState(true);
@@ -52,6 +50,11 @@ export default function OrderPage() {
       if (errorTimer.current) clearTimeout(errorTimer.current);
     };
   }, []);
+
+  const categories = useMemo(() => {
+    const cats = [...new Set(menuData.map((item) => item.category).filter(Boolean))];
+    return ['All', ...cats.sort()];
+  }, [menuData]);
 
   const filteredMenu = useMemo(() => {
     return menuData.filter((item) => {
@@ -211,7 +214,7 @@ export default function OrderPage() {
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
