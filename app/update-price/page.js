@@ -177,7 +177,7 @@ export default function UpdatePricePage() {
   };
 
   return (
-    <div className="min-h-screen bg-kerala-cream pb-12">
+    <div className="min-h-screen bg-kerala-cream pb-20 sm:pb-12">
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 py-6">

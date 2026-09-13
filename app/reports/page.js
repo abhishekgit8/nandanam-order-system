@@ -103,7 +103,7 @@ export default function ReportsPage() {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
   return (
-    <div className="min-h-screen bg-kerala-cream pb-12">
+    <div className="min-h-screen bg-kerala-cream pb-20 sm:pb-12">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 py-6">

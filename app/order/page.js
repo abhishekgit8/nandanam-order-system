@@ -140,7 +140,7 @@ export default function OrderPage() {
   const needsPrice = (item) => item.seasonal && item.price === 0;
 
   return (
-    <div className="min-h-screen bg-kerala-cream pb-32">
+    <div className="min-h-screen bg-kerala-cream pb-20 sm:pb-4">
       <Navbar />
 
       {seasonalItem && (
