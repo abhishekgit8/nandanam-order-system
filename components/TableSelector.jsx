@@ -4,7 +4,7 @@ const TABLES = Array.from({ length: 12 }, (_, i) => ({
   id: `Table ${i + 1}`,
   label: `T${i + 1}`,
 }));
-TABLES.push({ id: 'Takeaway', label: '📦' });
+TABLES.push({ id: 'Takeaway', label: '📦', isTakeaway: true });
 
 export default function TableSelector({ selected, onSelect, activeOrders = [] }) {
   const getTableStatus = (tableId) => {
@@ -37,7 +37,8 @@ export default function TableSelector({ selected, onSelect, activeOrders = [] })
                 isSelected ? selectedStyle : statusStyles[status]
               }`}
             >
-              <span className="text-sm">{table.label}</span>
+              <span className="text-sm">{table.isTakeaway ? '📦' : table.label}</span>
+              {table.isTakeaway && <span className="text-[9px] leading-tight font-semibold">Parcel</span>}
               {status === 'pending' && (
                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
               )}
