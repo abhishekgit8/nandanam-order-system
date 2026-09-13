@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getCachedMenu } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
+import TableSelector from '@/components/TableSelector';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
@@ -20,6 +21,7 @@ export default function OrderPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [seasonalItem, setSeasonalItem] = useState(null);
   const [seasonalPrice, setSeasonalPrice] = useState('');
+  const [activeOrders, setActiveOrders] = useState([]);
   const successTimer = useRef(null);
   const errorTimer = useRef(null);
 
@@ -34,6 +36,14 @@ export default function OrderPage() {
       setMenuLoading(false);
     };
     fetchMenu();
+
+    const fetchActiveOrders = async () => {
+      const { data } = await supabase
+        .from('active_orders')
+        .select('table_number, status');
+      if (data) setActiveOrders(data);
+    };
+    fetchActiveOrders();
   }, []);
 
   useEffect(() => {
@@ -183,18 +193,11 @@ export default function OrderPage() {
           </div>
         )}
 
-        <div className="bg-white p-3 rounded-xl shadow-sm border border-kerala-creamDark flex justify-between items-center">
-          <label className="font-bold text-kerala-charcoal text-sm">Select Table:</label>
-          <select
-            value={selectedTable}
-            onChange={(e) => setSelectedTable(e.target.value)}
-            className="p-2 bg-kerala-cream text-kerala-red font-bold rounded-lg border border-kerala-gold focus:outline-none"
-          >
-            {Array.from({ length: 12 }, (_, i) => `Table ${i + 1}`).concat(['Takeaway']).map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
+        <TableSelector
+          selected={selectedTable}
+          onSelect={setSelectedTable}
+          activeOrders={activeOrders}
+        />
 
         <div className="relative">
           <Search className="absolute left-3 top-3 text-gray-400" size={18} />
