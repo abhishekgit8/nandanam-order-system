@@ -318,7 +318,7 @@ export default function OrderPage() {
       </main>
 
       {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-kerala-gold p-4 shadow-2xl z-40">
+        <div className="fixed bottom-14 sm:bottom-0 left-0 right-0 bg-white border-t border-kerala-gold p-4 shadow-2xl z-40">
           <div className="max-w-3xl mx-auto flex justify-between items-center">
             <div>
               <p className="text-xs text-gray-500 font-semibold">{selectedTable} • {cartItemCount} Items</p>
