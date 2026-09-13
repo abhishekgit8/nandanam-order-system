@@ -208,12 +208,12 @@ export default function UpdatePricePage() {
         {showAddForm && (
           <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200 mb-4">
             <h3 className="font-bold text-kerala-charcoal mb-3">Add New Menu Item</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex items-center gap-2 sm:w-48">
                 <button
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-2xl p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                  className="text-2xl p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition flex-shrink-0"
                 >
                   {newItem.emoji}
                 </button>
@@ -226,7 +226,7 @@ export default function UpdatePricePage() {
                 />
               </div>
               {showEmojiPicker && (
-                <div className="sm:col-span-4">
+                <div className="sm:hidden">
                   <EmojiPicker
                     selected={newItem.emoji}
                     onSelect={(emoji) => {
@@ -236,7 +236,7 @@ export default function UpdatePricePage() {
                   />
                 </div>
               )}
-              <div className="relative">
+              <div className="relative sm:w-44">
                 <select
                   value={showNewCategory ? '__new__' : newItem.category}
                   onChange={(e) => {
@@ -257,7 +257,7 @@ export default function UpdatePricePage() {
                 </select>
               </div>
               {showNewCategory && (
-                <div className="flex gap-2">
+                <div className="flex gap-2 sm:w-44">
                   <input
                     type="text"
                     placeholder="Category name"
@@ -276,7 +276,7 @@ export default function UpdatePricePage() {
                   </button>
                 </div>
               )}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 sm:w-24">
                 <span className="text-sm font-bold text-gray-500">₹</span>
                 <input
                   type="number"
@@ -289,11 +289,22 @@ export default function UpdatePricePage() {
               <button
                 onClick={handleAddItem}
                 disabled={!newItem.name || !newItem.category || !newItem.price || saving}
-                className="bg-green-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-40"
+                className="bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-40 whitespace-nowrap"
               >
                 Add to Menu
               </button>
             </div>
+            {showEmojiPicker && (
+              <div className="hidden sm:block mt-3">
+                <EmojiPicker
+                  selected={newItem.emoji}
+                  onSelect={(emoji) => {
+                    setNewItem({ ...newItem, emoji });
+                    setShowEmojiPicker(false);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 
