@@ -19,6 +19,7 @@ export default function UpdatePricePage() {
   const [newItem, setNewItem] = useState({ name: '', category: '', price: '', seasonal: false });
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   useEffect(() => {
     const auth = sessionStorage.getItem('nandanam_auth');
@@ -148,6 +149,15 @@ export default function UpdatePricePage() {
       setNewItem((prev) => ({ ...prev, category: newCategoryName.trim() }));
       setNewCategoryName('');
       setShowNewCategory(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from('menu_items').delete().eq('id', id);
+    if (!error) {
+      setMenuItems((prev) => prev.filter((item) => item.id !== id));
+      invalidateMenuCache();
+      setDeleteConfirm(null);
     }
   };
 
@@ -350,6 +360,31 @@ export default function UpdatePricePage() {
                       {currentAvailable ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
                       {currentAvailable ? 'Active' : 'Hidden'}
                     </button>
+
+                    {deleteConfirm === item.id ? (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="bg-red-600 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg hover:bg-red-700"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirm(null)}
+                          className="bg-gray-200 text-gray-600 text-[10px] font-bold px-2 py-1.5 rounded-lg hover:bg-gray-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(item.id)}
+                        className="text-red-400 hover:text-red-600 transition p-1.5"
+                        title="Delete item"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               );
