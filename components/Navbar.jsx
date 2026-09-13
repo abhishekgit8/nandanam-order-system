@@ -9,7 +9,7 @@ export default function Navbar({ pendingCount }) {
   const isActive = (path) => pathname === path;
 
   const linkClass = (path) =>
-    `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+    `flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold border transition whitespace-nowrap flex-shrink-0 ${
       isActive(path)
         ? 'bg-kerala-gold text-kerala-charcoal border-kerala-gold shadow'
         : 'bg-black/20 text-white border-kerala-gold/30 hover:bg-black/40'
@@ -17,8 +17,8 @@ export default function Navbar({ pendingCount }) {
 
   return (
     <header className="bg-kerala-red text-kerala-cream shadow-md sticky top-0 z-50 border-b-2 border-kerala-gold">
-      <div className="max-w-7xl mx-auto px-3 py-2 flex justify-between items-center">
-        <Link href="/order" className="flex items-center gap-1.5 group">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 py-2 flex items-center gap-2">
+        <Link href="/order" className="flex items-center gap-1.5 group flex-shrink-0">
           <div className="w-8 h-8 bg-kerala-gold rounded-full flex items-center justify-center shadow-md group-hover:scale-105 transition">
             <svg viewBox="0 0 48 48" className="w-6 h-6">
               <ellipse cx="24" cy="14" rx="8" ry="10" fill="#FFD700" opacity="0.3"/>
@@ -33,7 +33,7 @@ export default function Navbar({ pendingCount }) {
           <h1 className="font-extrabold text-base tracking-wide text-white hidden sm:block">NANDANAM</h1>
         </Link>
 
-        <nav className="flex gap-1.5">
+        <nav className="flex gap-1.5 overflow-x-auto no-scrollbar ml-auto">
           <Link href="/order" className={linkClass('/order')}>
             <Utensils size={14} /> Take Order
           </Link>

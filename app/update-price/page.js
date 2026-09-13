@@ -18,6 +18,8 @@ export default function UpdatePricePage() {
   const [edits, setEdits] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [newItem, setNewItem] = useState({ name: '', category: '', price: '', seasonal: false });
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showNewCategory, setShowNewCategory] = useState(false);
 
   useEffect(() => {
     const auth = sessionStorage.getItem('nandanam_auth');
@@ -138,6 +140,19 @@ export default function UpdatePricePage() {
     setSaving(false);
   };
 
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    const { error } = await supabase
+      .from('categories')
+      .insert([{ name: newCategoryName.trim(), sort_order: categories.length }]);
+    if (!error) {
+      setCategories((prev) => [...prev, { name: newCategoryName.trim() }]);
+      setNewItem((prev) => ({ ...prev, category: newCategoryName.trim() }));
+      setNewCategoryName('');
+      setShowNewCategory(false);
+    }
+  };
+
   const getCurrentPrice = (item) => {
     if (edits[item.id]?.price !== undefined) return edits[item.id].price;
     return item.price;
@@ -190,16 +205,46 @@ export default function UpdatePricePage() {
                 onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                 className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
               />
-              <select
-                value={newItem.category}
-                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
-              >
-                <option value="">Select category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={showNewCategory ? '__new__' : newItem.category}
+                  onChange={(e) => {
+                    if (e.target.value === '__new__') {
+                      setShowNewCategory(true);
+                    } else {
+                      setShowNewCategory(false);
+                      setNewItem({ ...newItem, category: e.target.value });
+                    }
+                  }}
+                  className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none w-full"
+                >
+                  <option value="">Select category</option>
+                  {categories.map((c) => (
+                    <option key={c.id || c.name} value={c.name}>{c.name}</option>
+                  ))}
+                  <option value="__new__">+ New Category</option>
+                </select>
+              </div>
+              {showNewCategory && (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Category name"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                    className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none flex-1"
+                    autoFocus
+                  />
+                  <button
+                    onClick={handleAddCategory}
+                    disabled={!newCategoryName.trim()}
+                    className="bg-kerala-red text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-kerala-redHover disabled:opacity-40"
+                  >
+                    Add
+                  </button>
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <span className="text-sm font-bold text-gray-500">₹</span>
                 <input
