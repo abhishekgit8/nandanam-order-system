@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
+import EmojiPicker from '@/components/EmojiPicker';
 import { Save, Check, Search, ToggleLeft, ToggleRight, Plus, Trash2, X } from 'lucide-react';
 
 export default function UpdatePricePage() {
@@ -16,7 +17,8 @@ export default function UpdatePricePage() {
   const [search, setSearch] = useState('');
   const [edits, setEdits] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newItem, setNewItem] = useState({ name: '', category: '', price: '', seasonal: false });
+  const [newItem, setNewItem] = useState({ name: '', category: '', price: '', seasonal: false, emoji: '🍽️' });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showNewCategory, setShowNewCategory] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -122,6 +124,7 @@ export default function UpdatePricePage() {
         category: newItem.category,
         price: Number(newItem.price),
         seasonal: newItem.seasonal,
+        emoji: newItem.emoji,
         available: true,
       }])
       .select();
@@ -132,7 +135,7 @@ export default function UpdatePricePage() {
         .upsert({ name: newItem.category }, { onConflict: 'name' });
       setMenuItems((prev) => [...prev, ...data]);
       invalidateMenuCache();
-      setNewItem({ name: '', category: '', price: '', seasonal: false });
+      setNewItem({ name: '', category: '', price: '', seasonal: false, emoji: '🍽️' });
       setShowAddForm(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -206,13 +209,33 @@ export default function UpdatePricePage() {
           <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200 mb-4">
             <h3 className="font-bold text-kerala-charcoal mb-3">Add New Menu Item</h3>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              <input
-                type="text"
-                placeholder="Item name"
-                value={newItem.name}
-                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
-              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-2xl p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                >
+                  {newItem.emoji}
+                </button>
+                <input
+                  type="text"
+                  placeholder="Item name"
+                  value={newItem.name}
+                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  className="flex-1 p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
+                />
+              </div>
+              {showEmojiPicker && (
+                <div className="sm:col-span-4">
+                  <EmojiPicker
+                    selected={newItem.emoji}
+                    onSelect={(emoji) => {
+                      setNewItem({ ...newItem, emoji });
+                      setShowEmojiPicker(false);
+                    }}
+                  />
+                </div>
+              )}
               <div className="relative">
                 <select
                   value={showNewCategory ? '__new__' : newItem.category}
@@ -321,6 +344,7 @@ export default function UpdatePricePage() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
+                      <span className="text-base">{item.emoji || '🍽️'}</span>
                       <span className="font-bold text-kerala-charcoal text-sm truncate">{item.name}</span>
                       <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{item.category}</span>
                     </div>

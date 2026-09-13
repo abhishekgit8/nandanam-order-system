@@ -244,7 +244,7 @@ export default function OrderPage() {
                   className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center hover:border-kerala-gold transition"
                 >
                   <div>
-                    <p className="font-bold text-kerala-charcoal text-sm">{item.name}</p>
+                    <p className="font-bold text-kerala-charcoal text-sm">{item.emoji || '🍽️'} {item.name}</p>
                     {item.seasonal && item.price === 0 ? (
                       <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
                     ) : item.seasonal ? (

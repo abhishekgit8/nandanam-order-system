@@ -243,7 +243,7 @@ export default function DashboardPage() {
                     <div className="space-y-1.5 mb-4 text-sm text-gray-700">
                       {order.items.map((item, idx) => (
                         <div key={idx} className="flex justify-between font-medium">
-                          <span>{item.qty}x {item.name}</span>
+                          <span>{item.qty}x {item.emoji || '🍽️'} {item.name}</span>
                           <span>₹{item.price * item.qty}</span>
                         </div>
                       ))}

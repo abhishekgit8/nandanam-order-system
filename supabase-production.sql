@@ -58,3 +58,6 @@ CREATE POLICY "Allow delete menu_items" ON menu_items FOR DELETE USING (true);
 -- 6. Enable RLS on active_orders
 ALTER TABLE active_orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all active_orders" ON active_orders FOR ALL USING (true) WITH CHECK (true);
+
+-- 7. Add emoji column to menu_items
+ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS emoji TEXT DEFAULT '🍽️';
