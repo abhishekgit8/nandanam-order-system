@@ -75,6 +75,7 @@ export default function DashboardPage() {
           kot_number: order.kot_number,
           status: 'COMPLETED',
           created_at: order.created_at,
+          completed_at: new Date().toISOString(),
         }]);
       }
       setOrders((prev) => prev.filter((o) => o.id !== orderId));

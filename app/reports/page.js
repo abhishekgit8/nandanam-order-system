@@ -23,6 +23,17 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchOrders();
+
+    const channel = supabase
+      .channel('orders-history-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders_history' }, () => {
+        fetchOrders();
+      })
+      .subscribe();
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchOrders = async () => {

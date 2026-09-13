@@ -37,10 +37,10 @@ export default function Navbar({ pendingCount }) {
           <Link href="/order" className={linkClass('/order')}>
             <Utensils size={14} /> Take Order
           </Link>
-          <Link href="/dashboard" className={`relative ${linkClass('/dashboard')}`}>
+          <Link href="/dashboard" className={`${linkClass('/dashboard')} relative`}>
             <ChefHat size={14} /> Kitchen
             {pendingCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center leading-none">
                 {pendingCount}
               </span>
             )}
