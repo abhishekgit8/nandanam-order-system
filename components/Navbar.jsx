@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Utensils, LayoutDashboard, DollarSign, BarChart3 } from 'lucide-react';
+import { Utensils, LayoutDashboard, DollarSign, BarChart3, ChefHat } from 'lucide-react';
 
 export default function Navbar({ pendingCount }) {
   const pathname = usePathname();
@@ -38,7 +38,7 @@ export default function Navbar({ pendingCount }) {
             <Utensils size={14} /> Take Order
           </Link>
           <Link href="/dashboard" className={`relative ${linkClass('/dashboard')}`}>
-            <LayoutDashboard size={14} /> Dashboard
+            <ChefHat size={14} /> Kitchen
             {pendingCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
                 {pendingCount}
@@ -49,7 +49,7 @@ export default function Navbar({ pendingCount }) {
             <DollarSign size={14} /> Prices
           </Link>
           <Link href="/reports" className={linkClass('/reports')}>
-            <BarChart3 size={14} /> Reports
+            <LayoutDashboard size={14} /> Dashboard
           </Link>
         </nav>
       </div>

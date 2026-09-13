@@ -188,7 +188,7 @@ export default function DashboardPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         <h2 className="text-xl font-bold text-kerala-charcoal mb-4 flex items-center gap-2">
-          <Clock className="text-kerala-red" /> Live Kitchen Orders
+          <Clock className="text-kerala-red" /> Kitchen Orders
           {pendingCount > 0 && (
             <span className="bg-kerala-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
               {pendingCount} pending

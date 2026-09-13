@@ -98,7 +98,7 @@ export default function ReportsPage() {
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-kerala-charcoal flex items-center gap-2">
-            <BarChart3 className="text-kerala-red" /> Business Reports
+            <BarChart3 className="text-kerala-red" /> Dashboard
           </h2>
           <div className="flex gap-2">
             <button
