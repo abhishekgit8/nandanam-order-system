@@ -1,28 +1,17 @@
 -- Run this in Supabase SQL Editor after supabase-setup.sql and supabase-kot.sql
 
--- 1. Categories table (dynamic, replaces hardcoded CATEGORIES array)
+-- 1. Categories table (auto-synced from menu_items)
 CREATE TABLE IF NOT EXISTS categories (
   id SERIAL PRIMARY KEY,
   name TEXT UNIQUE NOT NULL,
   sort_order INTEGER DEFAULT 0
 );
 
--- Seed default categories
-INSERT INTO categories (name, sort_order) VALUES
-  ('Breakfast', 1),
-  ('Rice & Biriyani', 2),
-  ('Special', 3),
-  ('Fish Fry & Curry', 4),
-  ('Homely Special', 5),
-  ('Non Veg Curry', 6),
-  ('Egg Special', 7),
-  ('Starters', 8),
-  ('Shawarma', 9),
-  ('Alfam', 10),
-  ('Mandi', 11),
-  ('Fried Rice & Noodles', 12),
-  ('Chinese', 13),
-  ('Juice & Shakes', 14)
+-- Seed categories from existing menu_items (one-time)
+INSERT INTO categories (name, sort_order)
+SELECT DISTINCT category, ROW_NUMBER() OVER (ORDER BY category)
+FROM menu_items
+WHERE category IS NOT NULL
 ON CONFLICT (name) DO NOTHING;
 
 -- 2. Order history table (archive completed orders)
