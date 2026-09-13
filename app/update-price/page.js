@@ -1,22 +1,23 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
-import { Save, Check, Search, ToggleLeft, ToggleRight } from 'lucide-react';
-
-const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
+import { Save, Check, Search, ToggleLeft, ToggleRight, Plus, Trash2, X } from 'lucide-react';
 
 export default function UpdatePricePage() {
   const router = useRouter();
   const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [edits, setEdits] = useState({});
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newItem, setNewItem] = useState({ name: '', category: '', price: '', seasonal: false });
 
   useEffect(() => {
     const auth = sessionStorage.getItem('nandanam_auth');
@@ -24,24 +25,34 @@ export default function UpdatePricePage() {
       router.push('/login');
       return;
     }
-    fetchMenu();
+    fetchData();
   }, [router]);
 
-  const fetchMenu = async () => {
+  const fetchData = async () => {
     try {
-      const data = await getAllMenuItems();
-      setMenuItems(data);
+      const [menuData, catData] = await Promise.all([
+        getAllMenuItems(),
+        supabase.from('categories').select('*').order('sort_order'),
+      ]);
+      setMenuItems(menuData);
+      if (catData.data) setCategories(catData.data);
     } catch (error) {
-      console.error('Menu fetch error:', error);
+      console.error('Fetch error:', error);
     }
     setLoading(false);
   };
 
-  const filteredItems = menuItems.filter((item) => {
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const categoryNames = useMemo(() => {
+    return ['All', ...categories.map((c) => c.name)];
+  }, [categories]);
+
+  const filteredItems = useMemo(() => {
+    return menuItems.filter((item) => {
+      const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [menuItems, activeCategory, search]);
 
   const handlePriceChange = (id, newPrice) => {
     setEdits((prev) => ({ ...prev, [id]: { ...prev[id], price: newPrice } }));
@@ -63,6 +74,10 @@ export default function UpdatePricePage() {
     }));
   };
 
+  const handleSoftDelete = (id) => {
+    setEdits((prev) => ({ ...prev, [id]: { ...prev[id], available: false } }));
+  };
+
   const hasChanges = Object.keys(edits).length > 0;
 
   const handleSave = async () => {
@@ -75,9 +90,8 @@ export default function UpdatePricePage() {
       return supabase.from('menu_items').update(payload).eq('id', id);
     });
 
-    await Promise.all(updates);
-    
-    // Update local state from edits instead of refetching
+    await Promise.allSettled(updates);
+
     setMenuItems((prev) =>
       prev.map((item) => {
         const changes = edits[item.id];
@@ -90,12 +104,38 @@ export default function UpdatePricePage() {
         };
       })
     );
-    
+
     invalidateMenuCache();
     setEdits({});
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleAddItem = async () => {
+    if (!newItem.name || !newItem.category || !newItem.price) return;
+    setSaving(true);
+
+    const { data, error } = await supabase
+      .from('menu_items')
+      .insert([{
+        name: newItem.name,
+        category: newItem.category,
+        price: Number(newItem.price),
+        seasonal: newItem.seasonal,
+        available: true,
+      }])
+      .select();
+
+    if (!error && data) {
+      setMenuItems((prev) => [...prev, ...data]);
+      invalidateMenuCache();
+      setNewItem({ name: '', category: '', price: '', seasonal: false });
+      setShowAddForm(false);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }
+    setSaving(false);
   };
 
   const getCurrentPrice = (item) => {
@@ -119,17 +159,67 @@ export default function UpdatePricePage() {
 
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-kerala-charcoal">Update Menu Prices</h2>
-          {hasChanges && (
+          <h2 className="text-xl font-bold text-kerala-charcoal">Manage Menu</h2>
+          <div className="flex gap-2">
+            {hasChanges && (
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-kerala-red text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-kerala-redHover flex items-center gap-2 disabled:opacity-50"
+              >
+                {saved ? <><Check size={16} /> Saved!</> : saving ? 'Saving...' : <><Save size={16} /> Save Changes</>}
+              </button>
+            )}
             <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-kerala-red text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-kerala-redHover flex items-center gap-2 disabled:opacity-50"
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-green-700 flex items-center gap-2"
             >
-              {saved ? <><Check size={16} /> Saved!</> : saving ? 'Saving...' : <><Save size={16} /> Save Changes</>}
+              {showAddForm ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Item</>}
             </button>
-          )}
+          </div>
         </div>
+
+        {showAddForm && (
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-green-200 mb-4">
+            <h3 className="font-bold text-kerala-charcoal mb-3">Add New Menu Item</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <input
+                type="text"
+                placeholder="Item name"
+                value={newItem.name}
+                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
+              />
+              <select
+                value={newItem.category}
+                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                className="p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
+              >
+                <option value="">Select category</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-bold text-gray-500">₹</span>
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={newItem.price}
+                  onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                  className="w-full p-2 border border-gray-200 rounded-lg text-sm focus:border-kerala-red focus:outline-none"
+                />
+              </div>
+              <button
+                onClick={handleAddItem}
+                disabled={!newItem.name || !newItem.category || !newItem.price || saving}
+                className="bg-green-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-green-700 disabled:opacity-40"
+              >
+                Add to Menu
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="relative mb-4">
           <Search className="absolute left-3 top-3 text-gray-400" size={18} />
@@ -143,13 +233,13 @@ export default function UpdatePricePage() {
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar mb-4">
-          {CATEGORIES.map((cat) => (
+          {categoryNames.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
-                activeCategory === cat 
-                  ? 'bg-kerala-red text-white shadow-sm' 
+                activeCategory === cat
+                  ? 'bg-kerala-red text-white shadow-sm'
                   : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -170,11 +260,11 @@ export default function UpdatePricePage() {
               const currentSeasonal = getCurrentSeasonal(item);
               const currentAvailable = getCurrentAvailable(item);
               return (
-                <div 
+                <div
                   key={item.id}
                   className={`bg-white p-3 rounded-xl border shadow-sm flex flex-col sm:flex-row sm:items-center gap-3 transition ${
                     isEdited ? 'border-kerala-gold' : 'border-gray-100'
-                  }`}
+                  } ${!currentAvailable ? 'opacity-50' : ''}`}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -184,7 +274,6 @@ export default function UpdatePricePage() {
                   </div>
 
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    {/* Price Input */}
                     <div className="flex items-center gap-1">
                       <span className="text-sm font-bold text-gray-500">₹</span>
                       <input
@@ -195,12 +284,11 @@ export default function UpdatePricePage() {
                       />
                     </div>
 
-                    {/* Seasonal Toggle */}
                     <button
                       onClick={() => handleToggleSeasonal(item.id)}
                       className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1.5 rounded-lg border transition ${
-                        currentSeasonal 
-                          ? 'bg-orange-50 border-orange-300 text-orange-600' 
+                        currentSeasonal
+                          ? 'bg-orange-50 border-orange-300 text-orange-600'
                           : 'bg-gray-50 border-gray-200 text-gray-400'
                       }`}
                     >
@@ -208,12 +296,11 @@ export default function UpdatePricePage() {
                       Seasonal
                     </button>
 
-                    {/* Available Toggle */}
                     <button
                       onClick={() => handleToggleAvailable(item.id)}
                       className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1.5 rounded-lg border transition ${
-                        currentAvailable 
-                          ? 'bg-green-50 border-green-300 text-green-600' 
+                        currentAvailable
+                          ? 'bg-green-50 border-green-300 text-green-600'
                           : 'bg-red-50 border-red-300 text-red-500'
                       }`}
                     >
