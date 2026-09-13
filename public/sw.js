@@ -1,9 +1,7 @@
-const CACHE_NAME = 'nandanam-v1';
+const CACHE_NAME = 'nandanam-v2';
 const STATIC_ASSETS = [
-  '/icon-192.png',
-  '/icon-512.png',
+  '/logo.png',
   '/manifest.json',
-  '/logo.svg',
 ];
 
 self.addEventListener('install', (event) => {
