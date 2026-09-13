@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
+import { getAllMenuItems, getCachedCategories, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import { Save, Check, Search, ToggleLeft, ToggleRight, Plus, Trash2, X } from 'lucide-react';
 
@@ -34,10 +34,10 @@ export default function UpdatePricePage() {
     try {
       const [menuData, catData] = await Promise.all([
         getAllMenuItems(),
-        supabase.from('categories').select('*').order('sort_order'),
+        getCachedCategories(),
       ]);
       setMenuItems(menuData);
-      if (catData.data) setCategories(catData.data);
+      if (catData) setCategories(catData);
     } catch (error) {
       console.error('Fetch error:', error);
     }
@@ -150,6 +150,7 @@ export default function UpdatePricePage() {
       setNewItem((prev) => ({ ...prev, category: newCategoryName.trim() }));
       setNewCategoryName('');
       setShowNewCategory(false);
+      invalidateMenuCache();
     }
   };
 
