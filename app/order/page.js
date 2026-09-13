@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { getCachedMenu } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
 import TableSelector from '@/components/TableSelector';
+import VegIndicator from '@/components/VegIndicator';
 import { Search, Plus, Minus, ShoppingBag, CheckCircle, X } from 'lucide-react';
 
 export default function OrderPage() {
@@ -12,6 +13,7 @@ export default function OrderPage() {
   const [menuError, setMenuError] = useState('');
   const [selectedTable, setSelectedTable] = useState('Table 1');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [vegFilter, setVegFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,9 +62,12 @@ export default function OrderPage() {
     return menuData.filter((item) => {
       const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
       const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
-      return matchesCategory && matchesSearch;
+      const matchesVeg = vegFilter === 'all' ||
+        (vegFilter === 'veg' && item.veg !== false) ||
+        (vegFilter === 'nonveg' && item.veg === false);
+      return matchesCategory && matchesSearch && matchesVeg;
     });
-  }, [menuData, activeCategory, search]);
+  }, [menuData, activeCategory, search, vegFilter]);
 
   const totalAmount = useMemo(() => {
     return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -229,6 +234,28 @@ export default function OrderPage() {
           ))}
         </div>
 
+        {/* Veg/Non-Veg Filter */}
+        <div className="flex gap-2 mb-3">
+          {[
+            { key: 'all', label: 'All', icon: null },
+            { key: 'veg', label: 'Veg', icon: '🟢' },
+            { key: 'nonveg', label: 'Non-Veg', icon: '🔴' },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setVegFilter(f.key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                vegFilter === f.key
+                  ? 'bg-kerala-red text-white shadow-sm'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {f.icon && <span className="text-sm">{f.icon}</span>}
+              {f.label}
+            </button>
+          ))}
+        </div>
+
         {menuLoading ? (
           <div className="bg-white p-8 text-center rounded-2xl border border-gray-200">
             <p className="text-gray-400 font-semibold">Loading menu...</p>
@@ -243,15 +270,23 @@ export default function OrderPage() {
                   key={item.id}
                   className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center hover:border-kerala-gold transition"
                 >
-                  <div>
-                    <p className="font-bold text-kerala-charcoal text-sm">{item.emoji || '🍽️'} {item.name}</p>
-                    {item.seasonal && item.price === 0 ? (
-                      <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
-                    ) : item.seasonal ? (
-                      <p className="text-xs text-orange-500 font-semibold">₹{item.price}</p>
-                    ) : (
-                      <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
-                    )}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center text-xl flex-shrink-0">
+                      {item.emoji || '🍽️'}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <VegIndicator veg={item.veg !== false} />
+                        <p className="font-bold text-kerala-charcoal text-sm">{item.name}</p>
+                      </div>
+                      {item.seasonal && item.price === 0 ? (
+                        <p className="text-xs text-orange-500 font-semibold">Seasonal</p>
+                      ) : item.seasonal ? (
+                        <p className="text-xs text-orange-500 font-semibold">₹{item.price}</p>
+                      ) : (
+                        <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
+                      )}
+                    </div>
                   </div>
 
                   {inCart ? (

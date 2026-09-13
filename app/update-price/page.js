@@ -261,7 +261,7 @@ export default function UpdatePricePage() {
                         currentAvailable ? 'bg-green-50 border-green-300 text-green-600' : 'bg-red-50 border-red-300 text-red-500'
                       }`}>
                       {currentAvailable ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
-                      {currentAvailable ? 'Active' : 'Hidden'}
+                      {currentAvailable ? 'Available' : 'Unavailable'}
                     </button>
                     <button onClick={() => openEdit(item)}
                       className="text-gray-400 hover:text-blue-600 transition p-1.5" title="Edit item">
