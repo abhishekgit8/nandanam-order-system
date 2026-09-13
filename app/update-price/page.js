@@ -126,6 +126,9 @@ export default function UpdatePricePage() {
       .select();
 
     if (!error && data) {
+      await supabase
+        .from('categories')
+        .upsert({ name: newItem.category }, { onConflict: 'name' });
       setMenuItems((prev) => [...prev, ...data]);
       invalidateMenuCache();
       setNewItem({ name: '', category: '', price: '', seasonal: false });
