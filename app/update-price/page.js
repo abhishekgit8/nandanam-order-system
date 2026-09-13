@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { getAllMenuItems, invalidateMenuCache } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
@@ -8,6 +9,7 @@ import { Save, Check, Search, ToggleLeft, ToggleRight } from 'lucide-react';
 const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry & Curry', 'Homely Special', 'Non Veg Curry', 'Egg Special', 'Starters', 'Shawarma', 'Alfam', 'Mandi', 'Fried Rice & Noodles', 'Chinese', 'Juice & Shakes'];
 
 export default function UpdatePricePage() {
+  const router = useRouter();
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -17,8 +19,13 @@ export default function UpdatePricePage() {
   const [edits, setEdits] = useState({});
 
   useEffect(() => {
+    const auth = sessionStorage.getItem('nandanam_auth');
+    if (auth !== 'true') {
+      router.push('/login');
+      return;
+    }
     fetchMenu();
-  }, []);
+  }, [router]);
 
   const fetchMenu = async () => {
     try {

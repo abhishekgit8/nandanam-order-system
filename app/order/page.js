@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getCachedMenu } from '@/lib/menuCache';
 import Navbar from '@/components/Navbar';
@@ -10,6 +10,7 @@ const CATEGORIES = ['All', 'Breakfast', 'Rice & Biriyani', 'Special', 'Fish Fry 
 export default function OrderPage() {
   const [menuData, setMenuData] = useState([]);
   const [menuLoading, setMenuLoading] = useState(true);
+  const [menuError, setMenuError] = useState('');
   const [selectedTable, setSelectedTable] = useState('Table 1');
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
@@ -19,6 +20,8 @@ export default function OrderPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [seasonalItem, setSeasonalItem] = useState(null);
   const [seasonalPrice, setSeasonalPrice] = useState('');
+  const successTimer = useRef(null);
+  const errorTimer = useRef(null);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -26,20 +29,37 @@ export default function OrderPage() {
         const data = await getCachedMenu();
         setMenuData(data);
       } catch (error) {
-        console.error('Menu fetch error:', error);
+        setMenuError('Failed to load menu. Please refresh.');
       }
       setMenuLoading(false);
     };
     fetchMenu();
   }, []);
 
-  const filteredMenu = menuData.filter((item) => {
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  useEffect(() => {
+    return () => {
+      if (successTimer.current) clearTimeout(successTimer.current);
+      if (errorTimer.current) clearTimeout(errorTimer.current);
+    };
+  }, []);
 
-  const addToCart = (item) => {
+  const filteredMenu = useMemo(() => {
+    return menuData.filter((item) => {
+      const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+      const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [menuData, activeCategory, search]);
+
+  const totalAmount = useMemo(() => {
+    return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }, [cart]);
+
+  const cartItemCount = useMemo(() => {
+    return cart.reduce((s, i) => s + i.qty, 0);
+  }, [cart]);
+
+  const addToCart = useCallback((item) => {
     setCart((prev) => {
       const exists = prev.find((i) => i.id === item.id);
       if (exists) {
@@ -47,16 +67,16 @@ export default function OrderPage() {
       }
       return [...prev, { ...item, qty: 1 }];
     });
-  };
+  }, []);
 
-  const handleSeasonalAdd = () => {
+  const handleSeasonalAdd = useCallback(() => {
     if (!seasonalPrice || Number(seasonalPrice) <= 0) return;
     addToCart({ ...seasonalItem, price: Number(seasonalPrice) });
     setSeasonalItem(null);
     setSeasonalPrice('');
-  };
+  }, [seasonalPrice, seasonalItem, addToCart]);
 
-  const updateQty = (id, delta) => {
+  const updateQty = useCallback((id, delta) => {
     setCart((prev) =>
       prev
         .map((item) => {
@@ -68,42 +88,37 @@ export default function OrderPage() {
         })
         .filter(Boolean)
     );
-  };
-
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }, []);
 
   const handleSubmitOrder = async () => {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || loading) return;
     setLoading(true);
     setErrorMsg('');
 
     try {
-      const { data, error } = await supabase
-        .from('active_orders')
-        .insert([
-          {
-            table_number: selectedTable,
-            items: cart,
-            total_amount: totalAmount,
-            status: 'PENDING',
-          },
-        ]);
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table_number: selectedTable,
+          items: cart,
+          total_amount: totalAmount,
+        }),
+      });
 
-      console.log('Order submit result:', JSON.stringify({ data, error }));
+      const result = await res.json();
 
-      if (error) {
-        console.error('Order submit error:', error);
-        setErrorMsg(error.message || 'Failed to send order.');
-        setTimeout(() => setErrorMsg(''), 5000);
+      if (!res.ok) {
+        setErrorMsg(result.error || 'Failed to send order.');
+        errorTimer.current = setTimeout(() => setErrorMsg(''), 5000);
       } else {
         setShowSuccess(true);
         setCart([]);
-        setTimeout(() => setShowSuccess(false), 3000);
+        successTimer.current = setTimeout(() => setShowSuccess(false), 3000);
       }
     } catch (err) {
-      console.error('Order submit exception:', err);
-      setErrorMsg(err.message);
-      setTimeout(() => setErrorMsg(''), 5000);
+      setErrorMsg('Network error. Check your connection.');
+      errorTimer.current = setTimeout(() => setErrorMsg(''), 5000);
     } finally {
       setLoading(false);
     }
@@ -115,7 +130,6 @@ export default function OrderPage() {
     <div className="min-h-screen bg-kerala-cream pb-32">
       <Navbar />
 
-      {/* Seasonal Price Input Modal */}
       {seasonalItem && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
@@ -163,10 +177,16 @@ export default function OrderPage() {
       )}
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
+        {menuError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl text-sm font-semibold">
+            {menuError}
+          </div>
+        )}
+
         <div className="bg-white p-3 rounded-xl shadow-sm border border-kerala-creamDark flex justify-between items-center">
           <label className="font-bold text-kerala-charcoal text-sm">Select Table:</label>
-          <select 
-            value={selectedTable} 
+          <select
+            value={selectedTable}
             onChange={(e) => setSelectedTable(e.target.value)}
             className="p-2 bg-kerala-cream text-kerala-red font-bold rounded-lg border border-kerala-gold focus:outline-none"
           >
@@ -193,8 +213,8 @@ export default function OrderPage() {
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
-                activeCategory === cat 
-                  ? 'bg-kerala-red text-white shadow-sm' 
+                activeCategory === cat
+                  ? 'bg-kerala-red text-white shadow-sm'
                   : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >
@@ -213,8 +233,8 @@ export default function OrderPage() {
               const inCart = cart.find((i) => i.id === item.id);
               const needsPriceItem = needsPrice(item);
               return (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center hover:border-kerala-gold transition"
                 >
                   <div>
@@ -227,7 +247,7 @@ export default function OrderPage() {
                       <p className="text-xs text-kerala-red font-semibold">₹{item.price}</p>
                     )}
                   </div>
-                  
+
                   {inCart ? (
                     <div className="flex items-center gap-2 bg-kerala-cream px-2 py-1 rounded-lg border border-kerala-gold">
                       <button onClick={() => updateQty(item.id, -1)} className="text-kerala-red font-bold px-1"><Minus size={14} /></button>
@@ -260,7 +280,7 @@ export default function OrderPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-kerala-gold p-4 shadow-2xl z-40">
           <div className="max-w-3xl mx-auto flex justify-between items-center">
             <div>
-              <p className="text-xs text-gray-500 font-semibold">{selectedTable} • {cart.reduce((s, i) => s + i.qty, 0)} Items</p>
+              <p className="text-xs text-gray-500 font-semibold">{selectedTable} • {cartItemCount} Items</p>
               <p className="text-lg font-extrabold text-kerala-red">Total: ₹{totalAmount}</p>
             </div>
             <button

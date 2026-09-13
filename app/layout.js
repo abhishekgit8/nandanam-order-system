@@ -1,4 +1,5 @@
 import './globals.css'
+import ErrorBoundary from '@/components/ErrorBoundary'
 
 export const metadata = {
   title: 'Nandanam Restaurant - Order System',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
       <body>
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {

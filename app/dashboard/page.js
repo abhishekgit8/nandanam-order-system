@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import { Clock, Printer, XCircle, ChefHat } from 'lucide-react';
@@ -27,7 +27,6 @@ export default function DashboardPage() {
       .select('*')
       .order('created_at', { ascending: true });
     if (error) {
-      console.error('Fetch orders error:', error);
       setFetchError(error.message);
     } else {
       setOrders(data);
@@ -51,11 +50,7 @@ export default function DashboardPage() {
         .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'active_orders' }, (payload) => {
           setOrders((prev) => prev.filter((o) => o.id !== payload.old.id));
         })
-        .subscribe((status) => {
-          if (status === 'CHANNEL_ERROR') {
-            console.error('Realtime subscription failed. Enable Realtime on active_orders table in Supabase.');
-          }
-        });
+        .subscribe();
     } catch (e) {
       console.error('Realtime setup error:', e);
     }
@@ -70,6 +65,18 @@ export default function DashboardPage() {
 
   const handleStatusChange = async (orderId, newStatus) => {
     if (newStatus === 'COMPLETED') {
+      const order = orders.find((o) => o.id === orderId);
+      if (order) {
+        await supabase.from('orders_history').insert([{
+          id: order.id,
+          table_number: order.table_number,
+          items: order.items,
+          total_amount: order.total_amount,
+          kot_number: order.kot_number,
+          status: 'COMPLETED',
+          created_at: order.created_at,
+        }]);
+      }
       setOrders((prev) => prev.filter((o) => o.id !== orderId));
       const { error } = await supabase.from('active_orders').delete().eq('id', orderId);
       if (error) fetchOrders();
@@ -92,6 +99,8 @@ export default function DashboardPage() {
     const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
     const kotNum = order.kot_number || String(order.id).slice(-6);
 
+    const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     const receiptHtml = `
       <!DOCTYPE html>
       <html>
@@ -112,9 +121,7 @@ export default function DashboardPage() {
             .row { display: flex; justify-content: space-between; }
             .item-row { margin-bottom: 2px; }
             .item-top { display: flex; justify-content: space-between; }
-            .item-name { }
             .item-vals { display: flex; justify-content: space-between; font-size: 11px; }
-            .col-head { font-size: 8px; margin-bottom: 2px; }
             .footer { text-align: center; margin-top: 4px; font-size: 8px; }
           </style>
         </head>
@@ -124,28 +131,28 @@ export default function DashboardPage() {
           <div class="center" style="font-size:9px;">Bengaluru</div>
           <div class="double-line"></div>
           <div class="row bold" style="font-size:10px;">
-            <span>KOT #${kotNum}</span>
-            <span>${dateStr}</span>
+            <span>KOT #${escapeHtml(kotNum)}</span>
+            <span>${escapeHtml(dateStr)}</span>
           </div>
           <div class="row">
-            <span class="bold">Table: ${order.table_number}</span>
-            <span>${timeStr}</span>
+            <span class="bold">Table: ${escapeHtml(order.table_number)}</span>
+            <span>${escapeHtml(timeStr)}</span>
           </div>
           <div class="line"></div>
           ${order.items.map(i => `
             <div class="item-row">
-              <div class="item-top bold">${i.name}</div>
+              <div class="item-top bold">${escapeHtml(i.name)}</div>
               <div class="item-vals">
-                <span>Qty: ${i.qty}</span>
-                <span>Rate: ₹${i.price}</span>
-                <span>₹${i.price * i.qty}</span>
+                <span>Qty: ${escapeHtml(i.qty)}</span>
+                <span>Rate: ₹${escapeHtml(i.price)}</span>
+                <span>₹${escapeHtml(i.price * i.qty)}</span>
               </div>
             </div>
           `).join('')}
           <div class="line"></div>
           <div class="row bold" style="font-size:12px;">
             <span>TOTAL</span>
-            <span>₹${order.total_amount}</span>
+            <span>₹${escapeHtml(order.total_amount)}</span>
           </div>
           <div class="double-line"></div>
           <div class="footer">
@@ -165,7 +172,15 @@ export default function DashboardPage() {
     }
   };
 
-  const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+  const pendingCount = useMemo(() => orders.filter(o => o.status === 'PENDING').length, [orders]);
+
+  const sortedOrders = useMemo(() => {
+    return [...orders].sort((a, b) => {
+      if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
+      if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+  }, [orders]);
 
   return (
     <div className="min-h-screen bg-kerala-cream pb-12">
@@ -187,7 +202,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {orders.length === 0 && !fetchError ? (
+        {sortedOrders.length === 0 && !fetchError ? (
           <div className="bg-white p-12 text-center rounded-2xl border border-gray-200">
             <ChefHat className="mx-auto mb-4 text-gray-300" size={48} />
             <p className="text-gray-400 font-semibold text-lg">No active orders</p>
@@ -195,22 +210,17 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...orders].sort((a, b) => {
-              if (a.status === 'PENDING' && b.status !== 'PENDING') return -1;
-              if (a.status !== 'PENDING' && b.status === 'PENDING') return 1;
-              return new Date(a.created_at) - new Date(b.created_at);
-            }).map((order) => {
+            {sortedOrders.map((order) => {
               const isPending = order.status === 'PENDING';
-              const isServed = order.status === 'SERVED';
               const elapsed = order.created_at ? timeAgo(order.created_at) : '';
               const ageMin = order.created_at ? Math.floor((now - new Date(order.created_at)) / 60000) : 0;
               const isStale = isPending && ageMin > 15;
               return (
-                <div 
+                <div
                   key={order.id}
                   className={`rounded-2xl border-2 p-4 shadow-md flex flex-col justify-between transition ${
-                    isStale ? 'bg-white border-orange-400 animate-pulse' 
-                    : isPending ? 'bg-white border-kerala-red' 
+                    isStale ? 'bg-white border-orange-400 animate-pulse'
+                    : isPending ? 'bg-white border-kerala-red'
                     : 'bg-gray-50 border-gray-300 opacity-75'
                   }`}
                 >
