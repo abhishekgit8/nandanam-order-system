@@ -2,7 +2,8 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
-import { Clock, Printer, XCircle, ChefHat } from 'lucide-react';
+import { Clock, Printer, XCircle, ChefHat, Bluetooth, BluetoothConnected } from 'lucide-react';
+import { connectPrinter, printReceipt, isPrinterConnected, disconnectPrinter, getPrinterStatus } from '@/lib/thermalPrinter';
 
 function timeAgo(dateStr) {
   const now = new Date();
@@ -20,6 +21,9 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState([]);
   const [fetchError, setFetchError] = useState('');
   const [now, setNow] = useState(Date.now());
+  const [printerConnected, setPrinterConnected] = useState(false);
+  const [printerName, setPrinterName] = useState('');
+  const [printing, setPrinting] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     const { data, error } = await supabase
@@ -92,6 +96,41 @@ export default function DashboardPage() {
     setOrders((prev) => prev.filter((o) => o.id !== orderId));
     const { error } = await supabase.from('active_orders').delete().eq('id', orderId);
     if (error) fetchOrders();
+  };
+
+  const handleConnectPrinter = async () => {
+    try {
+      await connectPrinter();
+      const status = getPrinterStatus();
+      setPrinterConnected(status.connected);
+      setPrinterName(status.deviceName || 'Printer');
+    } catch (err) {
+      alert('Could not connect to printer: ' + err.message);
+    }
+  };
+
+  const handleDirectPrint = async (order) => {
+    if (!isPrinterConnected()) {
+      await handleConnectPrinter();
+      if (!isPrinterConnected()) return;
+    }
+
+    setPrinting(order.id);
+    try {
+      const now = new Date();
+      await printReceipt({
+        kotNumber: order.kot_number || String(order.id).slice(-6),
+        table: order.table_number,
+        date: now.toLocaleDateString('en-IN'),
+        time: now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        items: order.items.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        total: order.total_amount,
+      });
+    } catch (err) {
+      alert('Print failed: ' + err.message);
+      setPrinterConnected(false);
+    }
+    setPrinting(null);
   };
 
   const handlePrint = (order) => {
@@ -188,14 +227,27 @@ export default function DashboardPage() {
       <Navbar pendingCount={pendingCount} />
 
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <h2 className="text-xl font-bold text-kerala-charcoal mb-4 flex items-center gap-2">
-          <Clock className="text-kerala-red" /> Kitchen Orders
-          {pendingCount > 0 && (
-            <span className="bg-kerala-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {pendingCount} pending
-            </span>
-          )}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-kerala-charcoal flex items-center gap-2">
+            <Clock className="text-kerala-red" /> Kitchen Orders
+            {pendingCount > 0 && (
+              <span className="bg-kerala-red text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {pendingCount} pending
+              </span>
+            )}
+          </h2>
+          <button
+            onClick={handleConnectPrinter}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              printerConnected
+                ? 'bg-green-100 text-green-700 border border-green-300'
+                : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
+            }`}
+          >
+            {printerConnected ? <BluetoothConnected size={14} /> : <Bluetooth size={14} />}
+            {printerConnected ? printerName || 'Connected' : 'Connect Printer'}
+          </button>
+        </div>
 
         {fetchError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm font-semibold">
@@ -258,10 +310,18 @@ export default function DashboardPage() {
 
                     <div className="grid grid-cols-3 gap-2">
                       <button
+                        onClick={() => handleDirectPrint(order)}
+                        disabled={printing === order.id}
+                        className="bg-kerala-red text-white py-1.5 rounded-lg text-xs font-bold hover:bg-kerala-redHover flex items-center justify-center gap-1 disabled:opacity-50"
+                      >
+                        <Printer size={14} />
+                        {printing === order.id ? '...' : 'Print'}
+                      </button>
+                      <button
                         onClick={() => handlePrint(order)}
                         className="bg-gray-100 text-gray-700 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200 flex items-center justify-center gap-1"
                       >
-                        <Printer size={14} /> Print
+                        Preview
                       </button>
 
                       {isPending ? (
